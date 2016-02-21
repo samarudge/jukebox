@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <title>Jukebox</title>
+
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" />
+
+  <nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">Jukebox</a>
+
+      <a href="{{loginLink}}" class="btn btn-default navbar-btn navbar-right">Login With {{authProvider.Name}}</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    {{{content}}}
+  </div>
