@@ -6,6 +6,7 @@ import(
   "io/ioutil"
   log "github.com/Sirupsen/logrus"
   "encoding/json"
+  "os"
 )
 
 type google struct{
@@ -15,8 +16,8 @@ type google struct{
 var Google = google{
   AuthProvider: AuthProvider{
     Name:         "Google Apps",
-    ClientId:     "15473194917-1vtqe8qm3pjpiqre108ml72bqqoi9vhl.apps.googleusercontent.com",
-    ClientSecret: "3cTZaEofrFdmt7tXLTk8386j",
+    ClientId:     os.Getenv("JB_GOOGLE_CLIENT_ID"),
+    ClientSecret: os.Getenv("JB_GOOGLE_CLIENT_SECRET"),
     AuthURL:      "https://accounts.google.com/o/oauth2/auth",
     TokenURL:     "https://www.googleapis.com/oauth2/v3/token",
     Scopes:       []string{"profile", "email"},
