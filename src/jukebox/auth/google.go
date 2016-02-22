@@ -6,30 +6,25 @@ import(
   "io/ioutil"
   log "github.com/Sirupsen/logrus"
   "encoding/json"
-  "os"
 )
 
-type google struct{
-  authProvider
+type Google struct{
+  *BaseProvider
+  //UserData func(token *oauth2.Token) (UserData, error)
 }
 
-var Google = google{
-  authProvider: authProvider{
-    Name:         "Google Apps",
-    ClientId:     os.Getenv("JB_GOOGLE_CLIENT_ID"),
-    ClientSecret: os.Getenv("JB_GOOGLE_CLIENT_SECRET"),
-    AuthURL:      "https://accounts.google.com/o/oauth2/auth",
-    TokenURL:     "https://www.googleapis.com/oauth2/v3/token",
-    Scopes:       []string{"profile", "email"},
-  },
+func NewGoogle(p *BaseProvider) *Google{
+  p.Name =      "Google Apps"
+  p.AuthURL =   "https://accounts.google.com/o/oauth2/auth"
+  p.TokenURL =  "https://www.googleapis.com/oauth2/v3/token"
+  p.Scopes =    []string{"profile", "email"}
+
+  return &Google{
+    BaseProvider: p,
+  }
 }
 
-func (p *google) LoginLink(fromPage string) string{
-  config := p.OauthConfig()
-  return config.AuthCodeURL(fromPage)
-}
-
-func (p *google) UserData(token *oauth2.Token) (UserData, error){
+func (p *BaseProvider) GetUserData(token *oauth2.Token) (UserData, error){
   client := p.OauthClient(token)
   user := UserData{}
 

@@ -1,4 +1,5 @@
 storage.db
 pkg/
 /jukebox
-environment.sh
+/environment.sh
+/config.yml

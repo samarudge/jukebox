@@ -1,20 +1,32 @@
 package auth
 
-type songkick struct{
-  authProvider
+import(
+  "golang.org/x/oauth2"
+)
+
+/*
+AuthURL:      "https://www.songkick.com/oauth2/login",
+TokenURL:     "https://www.songkick.com/oauth2/token",
+*/
+
+type Songkick struct{
+  *BaseProvider
+  //UserData func(token *oauth2.Token) (UserData, error)
 }
 
-var Songkick = songkick{
-  authProvider: authProvider{
-    Name:         "Songkick",
-    ClientId:     "",
-    ClientSecret: "",
-    AuthURL:      "https://www.songkick.com/oauth2/login",
-    TokenURL:     "https://www.songkick.com/oauth2/token",
-  },
+func NewSongkick(p *BaseProvider) *Songkick{
+  p.Name =      "Songkick"
+  p.AuthURL =   "https://www.songkick.com/oauth2/login"
+  p.TokenURL =  "https://www.songkick.com/oauth2/token"
+
+  return &Songkick{
+    BaseProvider: p,
+  }
 }
 
-func (p *songkick) LoginLink(fromPage string) string{
-  config := p.OauthConfig()
-  return config.AuthCodeURL(fromPage)
+func (p *Songkick) GetUserData(token *oauth2.Token) (UserData, error){
+  _ = p.OauthClient(token)
+  user := UserData{}
+
+  return user, nil
 }

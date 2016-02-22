@@ -13,7 +13,7 @@ func Auth() gin.HandlerFunc{
   */
 
   return func(c *gin.Context) {
-    c.Set("authProvider", auth.AuthProvider)
+    c.Set("authProvider", auth.Provider.Provider())
 
     authUserCookie, err := c.Cookie("jukebox_user")
     if err == nil{
@@ -43,7 +43,8 @@ func Auth() gin.HandlerFunc{
     }
 
     from := c.DefaultQuery("from", "/")
-    c.Set("loginLink", auth.AuthProvider.LoginLink(from))
+    state := SignValue(from)
+    c.Set("loginLink", auth.Provider.LoginLink(state))
 
     c.Next()
   }

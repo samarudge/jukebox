@@ -4,23 +4,16 @@ import(
   "github.com/gin-gonic/gin"
   "jukebox/auth"
   "jukebox/helpers"
-  "fmt"
   "jukebox/models"
   "strconv"
   "time"
+  "net/url"
 )
-
-func AuthLogin(c *gin.Context){
-  from := c.DefaultQuery("from", "/")
-
-  redirectUrl := fmt.Sprintf("http://%s/auth/callback?from=%s", c.Request.Host, from)
-  c.Redirect(302, auth.AuthProvider.LoginLink(redirectUrl))
-}
 
 func AuthCallback(c *gin.Context){
   code := c.DefaultQuery("code", "")
 
-  token, err := auth.AuthProvider.DoExchange(code)
+  token, err := auth.Provider.DoExchange(code)
 
   if err != nil{
     c.Status(500)
@@ -29,6 +22,17 @@ func AuthCallback(c *gin.Context){
       "errorDetails": err,
     })
   } else {
+    stateRaw := c.DefaultQuery("state", "")
+    state, err := helpers.VerifyValue(stateRaw)
+    if err != nil{
+      c.Status(403)
+      helpers.Render(c, "error.html", gin.H{
+        "errorTitle": "Error during authentication",
+        "errorDetails": "State mismatch",
+      })
+      return
+    }
+
     u := models.User{}
     u.CreateOrUpdateFromToken(token)
 
@@ -43,6 +47,7 @@ func AuthCallback(c *gin.Context){
       true,
     )
 
-    c.Redirect(302, "/")
+    fromPage, _ := url.Parse(state)
+    c.Redirect(302, fromPage.Path)
   }
 }

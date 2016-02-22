@@ -22,16 +22,16 @@ func (u *User) ById(userId string){
 }
 
 func (u *User) CreateOrUpdateFromToken(token *oauth2.Token){
-  userData, _ := auth.AuthProvider.UserData(token)
+  userData, _ := auth.Provider.GetUserData(token)
   u.Model = gorm.Model{}
   u.UserData = userData
 
   d := db.Db()
 
-  d.Where("provider_id = ? AND provider = ?", u.ProviderId, auth.AuthProvider.Name).First(&u)
+  d.Where("provider_id = ? AND provider = ?", u.ProviderId, auth.Provider.Provider().Name).First(&u)
 
   if d.NewRecord(u) {
-    u.Provider = auth.AuthProvider.Name
+    u.Provider = auth.Provider.Provider().Name
 
     d.Create(&u)
 
