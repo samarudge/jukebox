@@ -1,11 +1,11 @@
 package auth
 
 type songkick struct{
-  AuthProvider
+  authProvider
 }
 
 var Songkick = songkick{
-  AuthProvider: AuthProvider{
+  authProvider: authProvider{
     Name:         "Songkick",
     ClientId:     "",
     ClientSecret: "",

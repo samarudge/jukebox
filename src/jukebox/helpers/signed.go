@@ -1,31 +1,39 @@
 package helpers
 
 import (
-  "math/rand"
+  "fmt"
   "crypto/hmac"
   "crypto/sha256"
   "strings"
   "encoding/base64"
+  "os"
 )
 
-// From http://stackoverflow.com/a/22892986/744180
-var letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+var appSecret = []byte(os.Getenv("JB_SECRET"))
 
-func randomString(n int) []byte{
-    b := make([]byte, n)
-    for i := range b {
-        b[i] = letters[rand.Intn(len(letters))]
-    }
-    return b
-}
-
-// TODO: load this from config file instead of regenerating at runtime
-var appSecret = randomString(32)
-
-func SignValue(val string) string{
+func getHash(val string) string{
   mac := hmac.New(sha256.New, appSecret)
   mac.Write([]byte(val))
-  hash := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+  return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+}
 
-  return strings.Join([]string{val,hash}, "|")
+func SignValue(val string) string{
+  hash := getHash(val)
+
+  return strings.Join([]string{base64.StdEncoding.EncodeToString([]byte(val)),hash}, "|")
+}
+
+func VerifyValue(signed string) (string, error){
+  valueParts := strings.Split(signed, "|")
+  val, err := base64.StdEncoding.DecodeString(valueParts[0])
+  if err != nil {
+    return "", fmt.Errorf("Base64 Decode Error:", err)
+  }
+
+  targetHash := getHash(string(val))
+  if hmac.Equal([]byte(targetHash), []byte(valueParts[1])) {
+    return string(val), nil
+  } else {
+    return "", fmt.Errorf("Invalid hash")
+  }
 }

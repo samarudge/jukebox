@@ -2,7 +2,7 @@ package controllers
 
 import(
   "github.com/gin-gonic/gin"
-  //"jukebox/auth"
+  "jukebox/auth"
   "jukebox/helpers"
   "fmt"
   "jukebox/models"
@@ -14,13 +14,13 @@ func AuthLogin(c *gin.Context){
   from := c.DefaultQuery("from", "/")
 
   redirectUrl := fmt.Sprintf("http://%s/auth/callback?from=%s", c.Request.Host, from)
-  c.Redirect(302, helpers.AuthProvider.LoginLink(redirectUrl))
+  c.Redirect(302, auth.AuthProvider.LoginLink(redirectUrl))
 }
 
 func AuthCallback(c *gin.Context){
   code := c.DefaultQuery("code", "")
 
-  token, err := helpers.AuthProvider.DoExchange(code)
+  token, err := auth.AuthProvider.DoExchange(code)
 
   if err != nil{
     c.Status(500)

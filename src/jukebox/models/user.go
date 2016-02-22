@@ -4,9 +4,9 @@ import(
   "github.com/jinzhu/gorm"
   "golang.org/x/oauth2"
   "jukebox/auth"
-  "jukebox/helpers"
   "jukebox/db"
   log "github.com/Sirupsen/logrus"
+  "fmt"
 )
 
 type User struct{
@@ -16,17 +16,22 @@ type User struct{
   AccessToken   string
 }
 
+func (u *User) ById(userId string){
+  d := db.Db()
+  d.Where("id = ?", userId).First(&u)
+}
+
 func (u *User) CreateOrUpdateFromToken(token *oauth2.Token){
-  userData, _ := helpers.AuthProvider.UserData(token)
+  userData, _ := auth.AuthProvider.UserData(token)
   u.Model = gorm.Model{}
   u.UserData = userData
 
   d := db.Db()
 
-  d.Where("provider_id = ? AND provider = ?", u.ProviderId, helpers.AuthProvider.Name).First(&u)
+  d.Where("provider_id = ? AND provider = ?", u.ProviderId, auth.AuthProvider.Name).First(&u)
 
   if d.NewRecord(u) {
-    u.Provider = helpers.AuthProvider.Name
+    u.Provider = auth.AuthProvider.Name
 
     d.Create(&u)
 
@@ -45,4 +50,8 @@ func (u *User) CreateOrUpdateFromToken(token *oauth2.Token){
     "name": u.Name,
     "providerId": u.ProviderId,
   }).Info("Login")
+}
+
+func (u User) ProfileLink() string{
+  return fmt.Sprintf("/users/%d", u.ID)
 }

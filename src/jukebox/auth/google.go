@@ -10,11 +10,11 @@ import(
 )
 
 type google struct{
-  AuthProvider
+  authProvider
 }
 
 var Google = google{
-  AuthProvider: AuthProvider{
+  authProvider: authProvider{
     Name:         "Google Apps",
     ClientId:     os.Getenv("JB_GOOGLE_CLIENT_ID"),
     ClientSecret: os.Getenv("JB_GOOGLE_CLIENT_SECRET"),

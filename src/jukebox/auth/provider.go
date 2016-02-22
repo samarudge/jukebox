@@ -5,13 +5,15 @@ import (
   "net/http"
 )
 
+var AuthProvider = Google
+
 type UserData struct{
   ProviderId    string
   ProfilePhoto  string
   Name          string
 }
 
-type AuthProvider struct{
+type authProvider struct{
   Name          string
   ClientId      string
   ClientSecret  string
@@ -20,7 +22,7 @@ type AuthProvider struct{
   Scopes        []string
 }
 
-func (p *AuthProvider) OauthEndpoint() oauth2.Endpoint{
+func (p *authProvider) OauthEndpoint() oauth2.Endpoint{
   a := oauth2.Endpoint{
     AuthURL:  p.AuthURL,
     TokenURL: p.TokenURL,
@@ -29,7 +31,7 @@ func (p *AuthProvider) OauthEndpoint() oauth2.Endpoint{
   return a
 }
 
-func (p *AuthProvider) OauthConfig() oauth2.Config{
+func (p *authProvider) OauthConfig() oauth2.Config{
   a := oauth2.Config{
     ClientID:     p.ClientId,
     ClientSecret: p.ClientSecret,
@@ -41,18 +43,18 @@ func (p *AuthProvider) OauthConfig() oauth2.Config{
   return a
 }
 
-func (p *AuthProvider) RedirectURL() string{
+func (p *authProvider) RedirectURL() string{
   return "http://localhost:8080/auth/callback"
 }
 
-func (p *AuthProvider) DoExchange(code string) (*oauth2.Token, error){
+func (p *authProvider) DoExchange(code string) (*oauth2.Token, error){
   config := p.OauthConfig()
   token, err := config.Exchange(oauth2.NoContext, code)
 
   return token, err
 }
 
-func (p *AuthProvider) OauthClient(token *oauth2.Token) *http.Client{
+func (p *authProvider) OauthClient(token *oauth2.Token) *http.Client{
   config := p.OauthConfig()
   client := config.Client(oauth2.NoContext, token)
   return client

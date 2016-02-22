@@ -18,6 +18,7 @@ func Logger() gin.HandlerFunc{
     status := c.Writer.Status()
     clientIP := c.ClientIP()
     method := c.Request.Method
+    authUserId, _ := c.Get("authUserId")
 
     log.WithFields(log.Fields{
       "Duration": latency,
@@ -25,6 +26,7 @@ func Logger() gin.HandlerFunc{
       "ClientIP": clientIP,
       "Method": method,
       "Path": c.Request.URL.Path,
+      "User": authUserId,
     }).Info("request")
   }
 }

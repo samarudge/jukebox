@@ -8,7 +8,12 @@
     <div class="container">
       <a class="navbar-brand" href="/">Jukebox</a>
 
-      <a href="{{loginLink}}" class="btn btn-default navbar-btn navbar-right">Login With {{authProvider.Name}}</a>
+      {{#authUser}}
+        <p class="navbar-text navbar-right">Signed in as <a href="{{authUser.ProfileLink}}">{{authUser.Name}}</a>
+      {{/authUser}}
+      {{^authUser}}
+        <a href="{{loginLink}}" class="btn btn-default navbar-btn navbar-right">Login With {{authProvider.Name}}</a>
+      {{/authUser}}
     </div>
   </nav>
 
