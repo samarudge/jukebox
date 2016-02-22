@@ -7,6 +7,7 @@ import(
   "jukebox/db"
   log "github.com/Sirupsen/logrus"
   "fmt"
+  "time"
 )
 
 type User struct{
@@ -14,6 +15,9 @@ type User struct{
   auth.UserData
   Provider      string
   AccessToken   string
+  RefreshToken  string
+  TokenExpires  time.Time
+  LastSeen      time.Time
 }
 
 func (u *User) ById(userId string){
@@ -39,19 +43,29 @@ func (u *User) CreateOrUpdateFromToken(token *oauth2.Token){
       "userId": u.ID,
       "name": u.Name,
       "providerId": u.ProviderId,
-    }).Info("New User")
+    }).Debug("New User")
   }
 
   u.AccessToken = token.AccessToken
+  u.RefreshToken = token.RefreshToken
+  u.TokenExpires = token.Expiry.UTC()
   d.Save(&u)
 
   log.WithFields(log.Fields{
     "userId": u.ID,
     "name": u.Name,
     "providerId": u.ProviderId,
-  }).Info("Login")
+  }).Debug("Login")
 }
 
 func (u User) ProfileLink() string{
   return fmt.Sprintf("/users/%d", u.ID)
+}
+
+func (u User) LastSeenStamp() string{
+  return u.LastSeen.Format("Mon Jan 2 2006 15:04:05 MST")
+}
+
+func (u User) TokenExpiresIn() string{
+  return fmt.Sprintf("%s (in %s)", u.TokenExpires.Format("Mon Jan 2 2006 15:04:05 MST"), u.TokenExpires.Sub(time.Now().UTC()).String())
 }

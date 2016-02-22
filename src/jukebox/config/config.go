@@ -5,7 +5,6 @@ import(
   log "github.com/Sirupsen/logrus"
   "gopkg.in/yaml.v2"
   "io/ioutil"
-  "fmt"
   "jukebox/auth"
   "net/url"
 )
@@ -49,8 +48,6 @@ func Initialize(filePath string){
     }).Error("Could not load config file")
     os.Exit(1)
   }
-
-  fmt.Println(Config)
 
   // Validate config params
   if  Config.Secret == "" ||

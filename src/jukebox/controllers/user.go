@@ -9,8 +9,11 @@ import(
 
 func UserInfo(c *gin.Context){
   userId := c.Param("userId")
+  authUser := models.User{}
   userInterface, _ := c.Get("authUser")
-  authUser := userInterface.(models.User)
+  if userInterface != nil{
+    authUser = userInterface.(models.User)
+  }
 
   if userId != strconv.FormatUint(uint64(authUser.ID), 10) {
     c.Status(403)

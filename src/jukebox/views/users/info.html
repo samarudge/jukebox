@@ -1,4 +1,5 @@
-<div class="col-md-6">
+<div class="col-md-4">
+  <h1>{{user.Name}}</h1>
   <table class="table table-bordered">
     <tr>
       <th>User ID</th>
@@ -9,12 +10,20 @@
       <td>{{user.Provider}}</td>
     </tr>
     <tr>
+      <th>Last Seen</th>
+      <td>{{user.LastSeenStamp}}</td>
+    </tr>
+    <tr>
+      <th>Photo</th>
+      <td class="text-center"><img src="{{user.ProfilePhoto}}?sz=150" /></td>
+    </tr>
+    <tr>
       <th>Provider ID</th>
       <td>{{user.ProviderId}}</td>
     </tr>
     <tr>
-      <th>Name</th>
-      <td>{{user.Name}}</td>
-    </tr>
+      <th>Oauth Expires</th>
+      <td>{{user.TokenExpiresIn}}</td>
+    </td>
   </table>
 </div>
