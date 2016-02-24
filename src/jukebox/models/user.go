@@ -16,6 +16,7 @@ type User struct{
   Provider      string
   AccessToken   string
   RefreshToken  string
+  AuthValid     bool
   TokenExpires  time.Time
   LastSeen      time.Time
 }
@@ -25,8 +26,12 @@ func (u *User) ById(userId string){
   d.Where("id = ?", userId).First(&u)
 }
 
-func (u *User) CreateOrUpdateFromToken(token *oauth2.Token){
-  userData, _ := auth.Provider.GetUserData(token)
+func (u *User) CreateOrUpdateFromToken(token *oauth2.Token) error{
+  userData, err := auth.Provider.GetUserData(token)
+  if err != nil{
+    return err
+  }
+
   u.Model = gorm.Model{}
   u.UserData = userData
 
@@ -36,6 +41,7 @@ func (u *User) CreateOrUpdateFromToken(token *oauth2.Token){
 
   if d.NewRecord(u) {
     u.Provider = auth.Provider.Provider().Name
+    u.AuthValid = true
 
     d.Create(&u)
 
@@ -56,6 +62,47 @@ func (u *User) CreateOrUpdateFromToken(token *oauth2.Token){
     "name": u.Name,
     "providerId": u.ProviderId,
   }).Debug("Login")
+
+  return nil
+}
+
+func (u *User) CreateToken() *oauth2.Token{
+  t := oauth2.Token{}
+  t.AccessToken = u.AccessToken
+  t.RefreshToken = u.RefreshToken
+  t.Expiry = u.TokenExpires
+  log.WithFields(log.Fields{
+    "user":u.ID,
+  }).Debug("Loaded token")
+  return &t
+}
+
+func (u *User) RenewAuthToken() error{
+  if !u.AuthValid {
+    return fmt.Errorf("Auth not valid")
+  }
+
+  if time.Now().UTC().Sub(u.LastSeen).Hours() > 24*14 {
+    return fmt.Errorf("User not seen for 14 days")
+  }
+
+  tkn := u.CreateToken()
+  tkn.Expiry = time.Now().Add(time.Minute*-5)
+
+  c := auth.Provider.OauthConfig()
+  tks := c.TokenSource(oauth2.NoContext, tkn)
+  newToken, err := tks.Token()
+
+  if err != nil{
+    return err
+  }
+
+  log.WithFields(log.Fields{
+    "user": u.ID,
+    "newExpiry": newToken.Expiry,
+  }).Debug("Refreshed auth token")
+
+  return u.CreateOrUpdateFromToken(newToken)
 }
 
 func (u User) ProfileLink() string{

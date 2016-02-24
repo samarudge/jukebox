@@ -74,7 +74,7 @@ func (p *BaseProvider) OauthConfig() oauth2.Config{
 
 func (p *BaseProvider) LoginLink(state string) string{
   config := p.OauthConfig()
-  return config.AuthCodeURL(state)
+  return config.AuthCodeURL(state, oauth2.AccessTypeOffline)
 }
 
 func (p *BaseProvider) DoExchange(code string) (*oauth2.Token, error){

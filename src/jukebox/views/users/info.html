@@ -23,7 +23,13 @@
     </tr>
     <tr>
       <th>Oauth Expires</th>
-      <td>{{user.TokenExpiresIn}}</td>
+      <td>
+        <p>{{user.TokenExpiresIn}}
+        <form method="post" action="{{user.ProfileLink}}/renewToken">
+          <input type="submit" name="renew" value="Renew oAuth Token Now" class="btn btn-info" />
+        </form>
+      </td>
     </td>
+
   </table>
 </div>

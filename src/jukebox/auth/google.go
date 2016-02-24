@@ -28,7 +28,10 @@ func (p *BaseProvider) GetUserData(token *oauth2.Token) (UserData, error){
   client := p.OauthClient(token)
   user := UserData{}
 
-  rsp, _ := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+  rsp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+  if err != nil{
+    return user, err
+  }
 
   log.WithFields(log.Fields{
     "call": rsp.Request.URL,

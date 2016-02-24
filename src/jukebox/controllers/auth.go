@@ -6,7 +6,6 @@ import(
   "jukebox/helpers"
   "jukebox/models"
   "strconv"
-  "time"
   "net/url"
 )
 
@@ -40,7 +39,7 @@ func AuthCallback(c *gin.Context){
     c.SetCookie(
       "jukebox_user",
       cookieVal,
-      int(time.Since(token.Expiry).Seconds())*-1,
+      60*60*24*14, // Cookie valid for 14 days
       "/",
       "",
       false,

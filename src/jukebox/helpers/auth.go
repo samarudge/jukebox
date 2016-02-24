@@ -7,7 +7,47 @@ import(
   "jukebox/db"
   log "github.com/Sirupsen/logrus"
   "time"
+  "strconv"
 )
+
+func clearAuthCookie(c *gin.Context){
+  c.SetCookie(
+    "jukebox_user",
+    "",
+    -1,
+    "/",
+    "",
+    false,
+    true,
+  )
+}
+
+func AuthorizedUser() gin.HandlerFunc{
+  /*
+    Is user authorized to view self or other user
+  */
+
+  return func(c *gin.Context){
+    userId := c.Param("userId")
+    authUser := models.User{}
+    userInterface, _ := c.Get("authUser")
+    if userInterface != nil{
+      authUser = userInterface.(models.User)
+    }
+
+    if userId != strconv.FormatUint(uint64(authUser.ID), 10) {
+      c.Status(403)
+      Render(c, "error.html", gin.H{
+        "errorTitle": "Authentication Error",
+        "errorDetails": "You are not authorized to view this user",
+      })
+      c.Abort()
+    } else {
+      c.Set("userControllerRequest", authUser)
+      c.Next()
+    }
+  }
+}
 
 func Auth() gin.HandlerFunc{
   /*
@@ -32,15 +72,7 @@ func Auth() gin.HandlerFunc{
           "error": err,
         }).Warning("Invalid user cookie")
 
-        c.SetCookie(
-          "jukebox_user",
-          "",
-          -1,
-          "/",
-          "",
-          false,
-          true,
-        )
+        clearAuthCookie(c)
       } else {
         c.Set("authUserId", authUserId)
         c.Set("authUser", u)
