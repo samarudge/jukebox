@@ -22,6 +22,7 @@ func Start(bind string){
   //router.LoadHTMLGlob("src/jukebox/views/**")
 
   loadRoutes(router)
+  loadJobs()
 
   router.Run(bind)
 }

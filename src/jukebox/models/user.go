@@ -146,3 +146,37 @@ func (u User) TokenExpiresIn() string{
 func (u User) AuthExpiresIn() string{
   return readableExpiry(u.LastAuth.Add(auth.Provider.Provider().ReauthEvery))
 }
+
+
+func JobRenewUserAuth(){
+  activeFilter := time.Now().UTC().Add(time.Hour*-72)
+  authFilter := time.Now().UTC().Add((auth.Provider.Provider().ReauthEvery*-1)+(time.Minute*1))
+  users := []User{}
+  d := db.Db()
+  var userCount int
+
+  userQuery := d.Where("last_seen > ? and last_auth < ?", activeFilter, authFilter)
+  userQuery.Find(&users).Count(&userCount)
+
+  if userCount > 0{
+    log.WithFields(log.Fields{
+      "userCount":userCount,
+    }).Debug("Renewing user auth tokens")
+
+    for i,_ := range users{
+      u := users[i]
+      log.WithFields(log.Fields{
+        "user": u.ID,
+        "expired": u.AuthExpiresIn(),
+      }).Debug("Updating auth for user")
+
+      err := u.CheckAuth()
+      if err != nil{
+        log.WithFields(log.Fields{
+          "user": u.ID,
+          "err": err,
+        }).Warning("Could not reauth user")
+      }
+    }
+  }
+}
