@@ -22,7 +22,7 @@ func Render(c *gin.Context, name string, obj map[string]interface{}){
       obj[k] = v
     }
 
-    html := mustache.RenderFileInLayout(filePath, "src/jukebox/views/main.html", obj)
+    html := mustache.RenderFileInLayout(filePath, "views/main.html", obj)
 
     if c.Writer.Status() == 200{
       c.Status(200)

@@ -8,6 +8,15 @@
     <div class="container">
       <a class="navbar-brand" href="/">Jukebox</a>
 
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="/">Queue</a>
+        <li>
+          <a href="/popular">Popular</a>
+        <li>
+          <a href="{{authUser.ProfileLink}}/tracks">My Tracks</a>
+      </ul>
+
       {{#authUser}}
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
@@ -32,6 +41,13 @@
 
   <div class="container">
     {{{content}}}
+
+    <footer>
+      <p>&nbsp;
+      <p class="text-center text-muted">
+        <span class="glyphicon glyphicon-music"></span> Jukebox <span class="glyphicon glyphicon-music"></span>
+      <p class="text-center text-muted">
+        <a href="https://github.com/samarudge/jukebox" target="_blank">github.com/samarudge/jukebox</a>
   </div>
 
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
