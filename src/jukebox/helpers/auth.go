@@ -75,17 +75,51 @@ func Auth() gin.HandlerFunc{
 
         ClearAuthCookie(c)
       } else {
-        c.Set("authUserId", authUserId)
-        c.Set("authUser", u)
+        if u.TokenExpires.Sub(time.Now().UTC()).Minutes() < 5{
+          err := u.RenewAuthToken()
 
-        if time.Now().UTC().Sub(u.LastSeen).Minutes() > 5 {
-          log.WithFields(log.Fields{
-            "User": authUserId,
-          }).Debug("Updating User Last Seen")
+          if err != nil{
+            ClearAuthCookie(c)
+            c.Status(500)
+            Render(c, "error.html", gin.H{
+              "errorTitle": "Token Refresh Error",
+              "errorDetails": err,
+            })
+            c.Abort()
+            return
+          }
+        }
 
-          u.LastSeen = time.Now().UTC()
+        authExpiry := u.LastAuth.Add(auth.Provider.Provider().ReauthEvery).Sub(time.Now().UTC()).Minutes()
+        if authExpiry <= 0{
+          err := u.CheckAuth()
+          if err != nil{
+            ClearAuthCookie(c)
+            c.Status(500)
+            Render(c, "error.html", gin.H{
+              "errorTitle": "Reauth Error",
+              "errorDetails": err,
+            })
+            c.Abort()
+            return
+          }
+        }
 
-          d.Save(&u)
+        if ! u.AuthValid{
+          ClearAuthCookie(c)
+        } else {
+          c.Set("authUserId", authUserId)
+          c.Set("authUser", u)
+
+          if time.Now().UTC().Sub(u.LastSeen).Minutes() > 5 {
+            log.WithFields(log.Fields{
+              "User": authUserId,
+            }).Debug("Updating User Last Seen")
+
+            u.LastSeen = time.Now().UTC()
+
+            d.Save(&u)
+          }
         }
       }
     }

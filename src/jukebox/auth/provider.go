@@ -3,6 +3,7 @@ package auth
 import (
   "golang.org/x/oauth2"
   "net/http"
+  "time"
 )
 
 var Provider OauthProvider
@@ -31,6 +32,7 @@ type BaseProvider struct{
   AuthURL       string
   TokenURL      string
   Scopes        []string
+  ReauthEvery   time.Duration
   RedirectURL   string
 }
 

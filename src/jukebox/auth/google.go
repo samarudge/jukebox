@@ -6,6 +6,7 @@ import(
   "io/ioutil"
   log "github.com/Sirupsen/logrus"
   "encoding/json"
+  "time"
 )
 
 type Google struct{
@@ -14,10 +15,11 @@ type Google struct{
 }
 
 func NewGoogle(p *BaseProvider) *Google{
-  p.Name =      "Google Apps"
-  p.AuthURL =   "https://accounts.google.com/o/oauth2/auth"
-  p.TokenURL =  "https://www.googleapis.com/oauth2/v3/token"
-  p.Scopes =    []string{"profile", "email"}
+  p.Name =        "Google Apps"
+  p.AuthURL =     "https://accounts.google.com/o/oauth2/auth"
+  p.TokenURL =    "https://www.googleapis.com/oauth2/v3/token"
+  p.Scopes =      []string{"profile", "email"}
+  p.ReauthEvery = time.Minute*60
 
   return &Google{
     BaseProvider: p,

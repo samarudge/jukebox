@@ -17,6 +17,7 @@ type User struct{
   AccessToken   string
   RefreshToken  string
   AuthValid     bool
+  LastAuth      time.Time
   TokenExpires  time.Time
   LastSeen      time.Time
 }
@@ -27,21 +28,21 @@ func (u *User) ById(userId string){
 }
 
 func (u *User) CreateOrUpdateFromToken(token *oauth2.Token) error{
+  d := db.Db()
   userData, err := auth.Provider.GetUserData(token)
   if err != nil{
+    u.AuthValid = false
+    d.Save(&u)
     return err
   }
 
   u.Model = gorm.Model{}
   u.UserData = userData
 
-  d := db.Db()
-
   d.Where("provider_id = ? AND provider = ?", u.ProviderId, auth.Provider.Provider().Name).First(&u)
 
   if d.NewRecord(u) {
     u.Provider = auth.Provider.Provider().Name
-    u.AuthValid = true
 
     d.Create(&u)
 
@@ -52,9 +53,11 @@ func (u *User) CreateOrUpdateFromToken(token *oauth2.Token) error{
     }).Debug("New User")
   }
 
+  u.AuthValid = true
   u.AccessToken = token.AccessToken
   u.RefreshToken = token.RefreshToken
   u.TokenExpires = token.Expiry.UTC()
+  u.LastAuth = time.Now().UTC()
   d.Save(&u)
 
   log.WithFields(log.Fields{
@@ -94,6 +97,12 @@ func (u *User) RenewAuthToken() error{
   newToken, err := tks.Token()
 
   if err != nil{
+    log.WithFields(log.Fields{
+      "error": err,
+    }).Warning("Could not refresh auth token")
+    u.AuthValid = false
+    d := db.Db()
+    d.Save(&u)
     return err
   }
 
@@ -105,6 +114,19 @@ func (u *User) RenewAuthToken() error{
   return u.CreateOrUpdateFromToken(newToken)
 }
 
+func (u *User) CheckAuth() error{
+  tkn := u.CreateToken()
+  err := u.CreateOrUpdateFromToken(tkn)
+
+  if err != nil{
+    log.WithFields(log.Fields{
+      "error": err,
+    }).Warning("Could not verify auth")
+  }
+
+  return err
+}
+
 func (u User) ProfileLink() string{
   return fmt.Sprintf("/users/%d", u.ID)
 }
@@ -113,6 +135,14 @@ func (u User) LastSeenStamp() string{
   return u.LastSeen.Format("Mon Jan 2 2006 15:04:05 MST")
 }
 
+func readableExpiry(t time.Time) string{
+  return fmt.Sprintf("%s (in %s)", t.Format("Mon Jan 2 2006 15:04:05 MST"), t.Sub(time.Now().UTC()).String())
+}
+
 func (u User) TokenExpiresIn() string{
-  return fmt.Sprintf("%s (in %s)", u.TokenExpires.Format("Mon Jan 2 2006 15:04:05 MST"), u.TokenExpires.Sub(time.Now().UTC()).String())
+  return readableExpiry(u.TokenExpires)
+}
+
+func (u User) AuthExpiresIn() string{
+  return readableExpiry(u.LastAuth.Add(auth.Provider.Provider().ReauthEvery))
 }
