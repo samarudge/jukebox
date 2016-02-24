@@ -2,8 +2,8 @@ package main
 
 import (
   "os"
-  "jukebox/config"
-  "jukebox/app"
+  "github.com/samarudge/jukebox/config"
+  "github.com/samarudge/jukebox/app"
   "github.com/voxelbrain/goptions"
   log "github.com/Sirupsen/logrus"
 )

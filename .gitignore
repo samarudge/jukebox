@@ -3,3 +3,4 @@ pkg/
 /jukebox
 /environment.sh
 /config.yml
+/vendor/

@@ -1,0 +1,18 @@
+package: github.com/samarudge/jukebox
+import:
+- package: github.com/gin-gonic/gin
+- package: github.com/go-yaml/yaml
+- package: github.com/golang/protobuf
+- package: github.com/hoisie/mustache
+- package: github.com/jasonlvhit/gocron
+- package: github.com/jinzhu/gorm
+- package: github.com/jinzhu/inflection
+- package: github.com/lib/pq
+- package: github.com/manucorporat/sse
+- package: github.com/mattn/go-sqlite3
+- package: github.com/Sirupsen/logrus
+- package: github.com/voxelbrain/goptions
+- package: golang.org/x/net
+- package: golang.org/x/oauth2
+- package: gopkg.in/go-playground/validator.v8
+- package: gopkg.in/yaml.v2

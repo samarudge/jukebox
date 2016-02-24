@@ -1,0 +1,48 @@
+hash: 58a3f02482f621284d4b93f680e6f62e374d006b850323e77ee4919943559de1
+updated: 2016-02-24T17:20:08.746922848Z
+imports:
+- name: github.com/gin-gonic/gin
+  version: b3878c2465f34fa1772f666fea9adf05f1dca727
+  subpackages:
+  - binding
+  - render
+- name: github.com/go-yaml/yaml
+  version: f7716cbe52baa25d2e9b0d0da546fcf909fc16b4
+- name: github.com/golang/protobuf
+  version: 2402d76f3d41f928c7902a765dfc872356dd3aad
+  subpackages:
+  - proto
+- name: github.com/hoisie/mustache
+  version: af524a16a1b1bd467c342969bf37db23433466c4
+- name: github.com/jasonlvhit/gocron
+  version: 0b564bf03e9665599efbcba1c6fba3d84212c197
+- name: github.com/jinzhu/gorm
+  version: aa45da15421ddb1549a7060e5c189f8350a29166
+- name: github.com/jinzhu/inflection
+  version: 3272df6c21d04180007eb3349844c89a3856bc25
+- name: github.com/lib/pq
+  version: 69552e54d2a9d4c6a2438926a774930f7bc398ec
+  subpackages:
+  - hstore
+  - oid
+- name: github.com/manucorporat/sse
+  version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
+- name: github.com/mattn/go-sqlite3
+  version: 09d5c451710ef887470709463f4f04ff83e1e039
+- name: github.com/Sirupsen/logrus
+  version: 74bde9ea4c5b2c78995da8ed56d37e75644dc941
+- name: github.com/voxelbrain/goptions
+  version: 26cb8b04692384f4dc269de3b5fcf3e2ef78573e
+- name: golang.org/x/net
+  version: f315505cf3349909cdf013ea56690da34e96a451
+  subpackages:
+  - context
+- name: golang.org/x/oauth2
+  version: 2cd4472c321b6cba78e029d99f0e7fe51032fd21
+  subpackages:
+  - internal
+- name: gopkg.in/go-playground/validator.v8
+  version: 014792cf3e266caff1e916876be12282b33059e0
+- name: gopkg.in/yaml.v2
+  version: f7716cbe52baa25d2e9b0d0da546fcf909fc16b4
+devImports: []
