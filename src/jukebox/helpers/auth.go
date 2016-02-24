@@ -67,7 +67,7 @@ func Auth() gin.HandlerFunc{
       u := models.User{}
       u.ById(authUserId)
 
-      if err != nil || d.NewRecord(u){
+      if err != nil || d.NewRecord(u) || ! u.AuthValid{
         log.WithFields(log.Fields{
           "authCookie": authUserCookie,
           "error": err,
@@ -105,21 +105,17 @@ func Auth() gin.HandlerFunc{
           }
         }
 
-        if ! u.AuthValid{
-          ClearAuthCookie(c)
-        } else {
-          c.Set("authUserId", authUserId)
-          c.Set("authUser", u)
+        c.Set("authUserId", authUserId)
+        c.Set("authUser", u)
 
-          if time.Now().UTC().Sub(u.LastSeen).Minutes() > 5 {
-            log.WithFields(log.Fields{
-              "User": authUserId,
-            }).Debug("Updating User Last Seen")
+        if time.Now().UTC().Sub(u.LastSeen).Minutes() > 5 {
+          log.WithFields(log.Fields{
+            "User": authUserId,
+          }).Debug("Updating User Last Seen")
 
-            u.LastSeen = time.Now().UTC()
+          u.LastSeen = time.Now().UTC()
 
-            d.Save(&u)
-          }
+          d.Save(&u)
         }
       }
     }
