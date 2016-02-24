@@ -6,14 +6,12 @@ import (
   "crypto/sha256"
   "strings"
   "encoding/base64"
-  "os"
+  "github.com/samarudge/jukebox/config"
   log "github.com/Sirupsen/logrus"
 )
 
-var appSecret = []byte(os.Getenv("JB_SECRET"))
-
 func getHash(val string) string{
-  mac := hmac.New(sha256.New, appSecret)
+  mac := hmac.New(sha256.New, []byte(config.Config.Secret))
   mac.Write([]byte(val))
   return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }
