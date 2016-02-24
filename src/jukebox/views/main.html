@@ -9,7 +9,20 @@
       <a class="navbar-brand" href="/">Jukebox</a>
 
       {{#authUser}}
-        <p class="navbar-text navbar-right">Signed in as <a href="{{authUser.ProfileLink}}">{{authUser.Name}}</a>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              Signed in as {{authUser.Name}}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="{{authUser.ProfileLink}}">Account Settings</a>
+              <li role="separator" class="divider"></li>
+              <li>
+                <a href="{{logoutLink}}">Logout</a>
+            </ul>
+        </ul>
       {{/authUser}}
       {{^authUser}}
         <a href="{{loginLink}}" class="btn btn-default navbar-btn navbar-right">Login With {{authProvider.Name}}</a>
@@ -20,3 +33,6 @@
   <div class="container">
     {{{content}}}
   </div>
+
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>

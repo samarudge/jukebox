@@ -46,7 +46,20 @@ func AuthCallback(c *gin.Context){
       true,
     )
 
-    fromPage, _ := url.Parse(state)
-    c.Redirect(302, fromPage.Path)
+    c.Redirect(302, state)
   }
+}
+
+func AuthLogout(c *gin.Context){
+  fromPageRaw := c.DefaultQuery("from", "")
+  fromPage, err := helpers.VerifyValue(fromPageRaw)
+
+  if err != nil{
+    fromPage = "/"
+  }
+
+  helpers.ClearAuthCookie(c)
+
+  from, _ := url.Parse(fromPage)
+  c.Redirect(302, from.Path)
 }

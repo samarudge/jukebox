@@ -25,7 +25,7 @@ func Logger() gin.HandlerFunc{
       "Status": status,
       "ClientIP": clientIP,
       "Method": method,
-      "Path": c.Request.URL.Path,
+      "Path": c.Request.URL.String(),
       "User": authUserId,
     }).Info("request")
   }

@@ -9,6 +9,7 @@ import(
 func loadRoutes(router *gin.Engine){
   router.GET("/", controllers.RoomList)
   router.GET("/auth/callback", controllers.AuthCallback)
+  router.GET("/auth/logout", controllers.AuthLogout)
 
   userActions := router.Group("/users")
   userActions.Use(helpers.AuthorizedUser())

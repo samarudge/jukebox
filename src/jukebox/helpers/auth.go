@@ -8,9 +8,10 @@ import(
   log "github.com/Sirupsen/logrus"
   "time"
   "strconv"
+  "net/url"
 )
 
-func clearAuthCookie(c *gin.Context){
+func ClearAuthCookie(c *gin.Context){
   c.SetCookie(
     "jukebox_user",
     "",
@@ -72,7 +73,7 @@ func Auth() gin.HandlerFunc{
           "error": err,
         }).Warning("Invalid user cookie")
 
-        clearAuthCookie(c)
+        ClearAuthCookie(c)
       } else {
         c.Set("authUserId", authUserId)
         c.Set("authUser", u)
@@ -89,9 +90,16 @@ func Auth() gin.HandlerFunc{
       }
     }
 
-    from := c.DefaultQuery("from", "/")
-    state := SignValue(from)
-    c.Set("loginLink", auth.Provider.LoginLink(state))
+    from := c.Request.URL.String()
+    pageFrom := SignValue(from)
+    c.Set("loginLink", auth.Provider.LoginLink(pageFrom))
+
+    logoutLink := url.URL{}
+    logoutLink.Path = "/auth/logout"
+    q := logoutLink.Query()
+    q.Set("from", pageFrom)
+    logoutLink.RawQuery = q.Encode()
+    c.Set("logoutLink", logoutLink.String())
 
     c.Next()
   }

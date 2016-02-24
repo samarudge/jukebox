@@ -7,6 +7,7 @@ import (
   "strings"
   "encoding/base64"
   "os"
+  log "github.com/Sirupsen/logrus"
 )
 
 var appSecret = []byte(os.Getenv("JB_SECRET"))
@@ -27,6 +28,11 @@ func VerifyValue(signed string) (string, error){
   valueParts := strings.Split(signed, "|")
   val, err := base64.StdEncoding.DecodeString(valueParts[0])
   if err != nil {
+    log.WithFields(log.Fields{
+      "source": signed,
+      "type": "base64",
+      "err": err,
+    }).Warning("Invalid signed value")
     return "", fmt.Errorf("Base64 Decode Error:", err)
   }
 
@@ -34,6 +40,11 @@ func VerifyValue(signed string) (string, error){
   if hmac.Equal([]byte(targetHash), []byte(valueParts[1])) {
     return string(val), nil
   } else {
+    log.WithFields(log.Fields{
+      "source": signed,
+      "type": "hash",
+      "err": "",
+    }).Warning("Invalid signed value")
     return "", fmt.Errorf("Invalid hash")
   }
 }
