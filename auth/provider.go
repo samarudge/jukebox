@@ -8,14 +8,14 @@ import (
 
 var Provider OauthProvider
 
-func LoadProvider(providerName string, p *BaseProvider){
+func LoadProvider(providerName string, p *BaseProvider, additionalConfig map[interface{}]interface{}){
   switch providerName{
     case "google":
-      Provider = NewGoogle(p)
+      Provider = NewGoogle(p, additionalConfig)
     case "songkick":
-      Provider = NewSongkick(p)
+      Provider = NewSongkick(p, additionalConfig)
     default:
-      Provider = NewSongkick(p)
+      Provider = NewSongkick(p, additionalConfig)
   }
 }
 
@@ -23,6 +23,7 @@ type UserData struct{
   ProviderId    string
   ProfilePhoto  string
   Name          string
+  Username      string
 }
 
 type BaseProvider struct{

@@ -13,9 +13,10 @@ type config struct{
   Secret    string
   Url       string
   Auth      struct{
-    Provider      string
-    Client_id      string
-    Client_secret  string
+    Provider        string
+    Client_id       string
+    Client_secret   string
+    Api_key         string
   }
 }
 
@@ -23,6 +24,7 @@ var Config config
 
 func Initialize(filePath string){
   Config = config{}
+  ConfigInterface := make(map[interface{}]interface{})
   if _, err := os.Stat(filePath); os.IsNotExist(err) {
     log.WithFields(log.Fields{
       "configFile": filePath,
@@ -49,6 +51,8 @@ func Initialize(filePath string){
     os.Exit(1)
   }
 
+  _ = yaml.Unmarshal(configContent, &ConfigInterface)
+
   // Validate config params
   if  Config.Secret == "" ||
       Config.Url == "" ||
@@ -72,6 +76,6 @@ func Initialize(filePath string){
   u.Path = "/auth/callback"
 
   p.RedirectURL = u.String()
-  auth.LoadProvider(Config.Auth.Provider, &p)
+  auth.LoadProvider(Config.Auth.Provider, &p, ConfigInterface)
 
 }

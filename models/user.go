@@ -81,6 +81,10 @@ func (u *User) CreateToken() *oauth2.Token{
 }
 
 func (u *User) RenewAuthToken() error{
+  if u.RefreshToken == "" && u.TokenExpires.IsZero(){
+    return nil
+  }
+
   if !u.AuthValid {
     return fmt.Errorf("Auth not valid")
   }

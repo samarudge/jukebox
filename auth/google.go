@@ -14,7 +14,7 @@ type Google struct{
   //UserData func(token *oauth2.Token) (UserData, error)
 }
 
-func NewGoogle(p *BaseProvider) *Google{
+func NewGoogle(p *BaseProvider, _ map[interface{}]interface{}) *Google{
   p.Name =        "Google Apps"
   p.AuthURL =     "https://accounts.google.com/o/oauth2/auth"
   p.TokenURL =    "https://www.googleapis.com/oauth2/v3/token"
@@ -26,7 +26,7 @@ func NewGoogle(p *BaseProvider) *Google{
   }
 }
 
-func (p *BaseProvider) GetUserData(token *oauth2.Token) (UserData, error){
+func (p *Google) GetUserData(token *oauth2.Token) (UserData, error){
   client := p.OauthClient(token)
   user := UserData{}
 
