@@ -4,23 +4,25 @@ import (
   "golang.org/x/oauth2"
   "net/http"
   "time"
+  "fmt"
+  "github.com/Machiel/slugify"
 )
 
 var Provider OauthProvider
 
-func LoadProvider(providerName string, p *BaseProvider, additionalConfig map[interface{}]interface{}){
-  switch providerName{
-    case "google":
-      Provider = NewGoogle(p, additionalConfig)
-    case "songkick":
-      Provider = NewSongkick(p, additionalConfig)
-    default:
-      Provider = NewSongkick(p, additionalConfig)
+func LoadProvider(providerName string, p BaseProvider, additionalConfig map[interface{}]interface{}) OauthProvider{
+  providers := []OauthProvider{NewGoogle(p, additionalConfig),NewSongkick(p, additionalConfig)}
+
+  for _, provider := range providers{
+    if provider.Provider().ProviderSlug() == providerName{
+      return provider
+    }
   }
+
+  panic(fmt.Sprintf("Was asked to load %s provider but it doesn't exist", providerName))
 }
 
 type UserData struct{
-  ProviderId    string
   ProfilePhoto  string
   Name          string
   Username      string
@@ -39,7 +41,8 @@ type BaseProvider struct{
 
 type OauthProvider interface{
   Provider()                        *BaseProvider
-  GetUserData(token *oauth2.Token)  (UserData, error)
+  ProviderSlug()                    string
+  GetUserData(token *oauth2.Token)  (string, UserData, error)
 
   OauthEndpoint()                   oauth2.Endpoint
   OauthConfig()                     oauth2.Config
@@ -91,4 +94,12 @@ func (p *BaseProvider) OauthClient(token *oauth2.Token) *http.Client{
   config := p.OauthConfig()
   client := config.Client(oauth2.NoContext, token)
   return client
+}
+
+func (p *BaseProvider) MakeProviderId(id string) string{
+  return fmt.Sprintf("%s/%s", p.ProviderSlug(), id)
+}
+
+func (p *BaseProvider) ProviderSlug() string{
+  return slugify.Slugify(p.Name)
 }

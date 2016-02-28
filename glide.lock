@@ -1,5 +1,5 @@
-hash: 58a3f02482f621284d4b93f680e6f62e374d006b850323e77ee4919943559de1
-updated: 2016-02-24T17:20:08.746922848Z
+hash: 621465ea5429de5675c0cfbae39b313663ae74bf8ceca5f1e6bdd895434acb42
+updated: 2016-02-28T12:01:52.888056238Z
 imports:
 - name: github.com/gin-gonic/gin
   version: b3878c2465f34fa1772f666fea9adf05f1dca727
@@ -24,7 +24,8 @@ imports:
   version: 69552e54d2a9d4c6a2438926a774930f7bc398ec
   subpackages:
   - hstore
-  - oid
+- name: github.com/Machiel/slugify
+  version: 9c8f186ad6ea352ad2709ad0ec08f2ecc8a1b424
 - name: github.com/manucorporat/sse
   version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
 - name: github.com/mattn/go-sqlite3
@@ -41,8 +42,22 @@ imports:
   version: 2cd4472c321b6cba78e029d99f0e7fe51032fd21
   subpackages:
   - internal
+- name: golang.org/x/sys
+  version: 19ced1583f732e8ff9d7d84de773dc621557df99
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: 6a436539be38c296a8075a871cc536686b458371
+  subpackages:
+  - urlfetch
+  - internal
+  - internal/urlfetch
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
 - name: gopkg.in/go-playground/validator.v8
-  version: 014792cf3e266caff1e916876be12282b33059e0
+  version: c193cecd124b5cc722d7ee5538e945bdb3348435
 - name: gopkg.in/yaml.v2
   version: f7716cbe52baa25d2e9b0d0da546fcf909fc16b4
 devImports: []

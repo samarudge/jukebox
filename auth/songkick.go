@@ -12,27 +12,36 @@ import(
 
 
 type Songkick struct{
-  *BaseProvider
+  BaseProvider
   ApiKey      string
-  //UserData func(token *oauth2.Token) (UserData, error)
 }
 
-func NewSongkick(p *BaseProvider, additionalConfig map[interface{}]interface{}) *Songkick{
+func NewSongkick(p BaseProvider, additionalConfig map[interface{}]interface{}) *Songkick{
   oauth2.RegisterBrokenAuthHeaderProvider("https://www.songkick.com/oauth")
   p.Name =      "Songkick"
   p.AuthURL =   "https://www.songkick.com/oauth/login"
   p.TokenURL =  "https://www.songkick.com/oauth/exchange"
   p.ReauthEvery = time.Minute*15
 
+  var apiKey string
+  authConfig := additionalConfig["auth"].(map[interface{}]interface{})
+  _, hasApiKey := authConfig["api_key"]
+  if hasApiKey{
+    apiKey = authConfig["api_key"].(string)
+  } else {
+    apiKey = ""
+  }
+
   return &Songkick{
     BaseProvider: p,
-    ApiKey: additionalConfig["auth"].(map[interface{}]interface{})["api_key"].(string),
+    ApiKey: apiKey,
   }
 }
 
-func (p *Songkick) GetUserData(token *oauth2.Token) (UserData, error){
+func (p *Songkick) GetUserData(token *oauth2.Token) (string, UserData, error){
   client := p.OauthClient(token)
   user := UserData{}
+  var ProviderId string
 
   userDetailsUrl, _ := url.Parse("https://api.songkick.com/api/3.0/users/:me.json")
   q := userDetailsUrl.Query()
@@ -43,7 +52,7 @@ func (p *Songkick) GetUserData(token *oauth2.Token) (UserData, error){
 
   rsp, err := client.Get(userDetailsUrl.String())
   if err != nil{
-    return user, err
+    return ProviderId, user, err
   }
 
   log.WithFields(log.Fields{
@@ -57,18 +66,19 @@ func (p *Songkick) GetUserData(token *oauth2.Token) (UserData, error){
 
   if rsp.StatusCode == 200 {
     if err := json.Unmarshal(responseRaw, &userData); err != nil {
-      return user, fmt.Errorf("Could not decode JSON", string(responseRaw))
+      return ProviderId, user, fmt.Errorf("Could not decode JSON", string(responseRaw))
     }
 
     skUserData := userData["resultsPage"].(map[string]interface{})["results"].(map[string]interface{})["user"].(map[string]interface{})
 
-    user.ProviderId = skUserData["id"].(string)
-    user.ProfilePhoto = fmt.Sprintf("https://images.sk-static.com/images/media/profile_images/users/%s/col2", user.ProviderId)
+    skId := skUserData["id"].(string)
+    ProviderId = p.MakeProviderId(skId)
+    user.ProfilePhoto = fmt.Sprintf("https://images.sk-static.com/images/media/profile_images/users/%s/col2", skId)
     user.Name = skUserData["username"].(string)
     user.Username = user.Name
   } else {
-    return user, fmt.Errorf("Could not get user data: %s %s", rsp.StatusCode, responseRaw)
+    return ProviderId, user, fmt.Errorf("Could not get user data: %s %s", rsp.StatusCode, responseRaw)
   }
 
-  return user, nil
+  return ProviderId, user, nil
 }

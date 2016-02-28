@@ -1,39 +1,45 @@
-<div class="col-md-4">
-  <h1>{{user.Name}}</h1>
-  <table class="table table-bordered">
-    <tr>
-      <th>User ID</th>
-      <td>{{user.ID}}</td>
-    </tr>
-    <tr>
-      <th>Provider</th>
-      <td>{{user.Provider}}</td>
-    </tr>
-    <tr>
-      <th>Last Seen</th>
-      <td>{{user.LastSeenStamp}}</td>
-    </tr>
-    <tr>
-      <th>Photo</th>
-      <td class="text-center"><img src="{{user.ProfilePhoto}}?sz=150" /></td>
-    </tr>
-    <tr>
-      <th>Provider ID</th>
-      <td>{{user.ProviderId}}</td>
-    </tr>
-    <tr>
-      <th>Auth Expires</th>
-      <td>{{user.AuthExpiresIn}}</td>
-    </tr>
-    <tr>
-      <th>Oauth Expires</th>
-      <td>
-        <p>{{user.TokenExpiresIn}}
-        <form method="post" action="{{user.ProfileLink}}/renewToken">
-          <input type="submit" name="renew" value="Renew oAuth Token Now" class="btn btn-info" />
-        </form>
+<div class="row">
+  <div class="col-md-4">
+    <h1>{{user.Name}}</h1>
+    <table class="table table-bordered">
+      <tr>
+        <th>User ID</th>
+        <td>{{user.ID}}</td>
+      </tr>
+      <tr>
+        <th>Auth ID</th>
+        <td>{{auth.ID}}</td>
+      </tr>
+      <tr>
+        <th>Provider</th>
+        <td>{{auth.Provider}}</td>
+      </tr>
+      <tr>
+        <th>Last Seen</th>
+        <td>{{user.LastSeenStamp}}</td>
+      </tr>
+      <tr>
+        <th>Photo</th>
+        <td class="text-center"><img src="{{user.ProfilePhoto}}?sz=150" /></td>
+      </tr>
+      <tr>
+        <th>Provider ID</th>
+        <td>{{auth.ProviderId}}</td>
+      </tr>
+      <tr>
+        <th>Auth Expires</th>
+        <td>{{auth.AuthExpiresIn}}</td>
+      </tr>
+      <tr>
+        <th>Oauth Expires</th>
+        <td>
+          <p>{{auth.TokenExpiresIn}}
+          <form method="post" action="{{user.ProfileLink}}/renewToken">
+            <input type="submit" name="renew" value="Renew oAuth Token Now" class="btn btn-info" />
+          </form>
+        </td>
       </td>
-    </td>
 
-  </table>
+    </table>
+  </div>
 </div>

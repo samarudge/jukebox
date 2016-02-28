@@ -4,19 +4,24 @@ import(
   "github.com/gin-gonic/gin"
   "github.com/samarudge/jukebox/helpers"
   "github.com/samarudge/jukebox/models"
+  "fmt"
 )
 
 func UserInfo(c *gin.Context){
   u := c.MustGet("userControllerRequest").(models.User)
+  a := u.Auth()
+  fmt.Println(a.TokenExpiresIn())
 
   helpers.Render(c, "users/info.html", gin.H{
     "user": u,
+    "auth": a,
   })
 }
 
 func UserRenewToken(c *gin.Context){
   u := c.MustGet("userControllerRequest").(models.User)
-  err := u.RenewAuthToken()
+  a := u.Auth()
+  err := a.RenewAuthToken()
 
   if err != nil{
     c.Status(500)

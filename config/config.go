@@ -76,6 +76,6 @@ func Initialize(filePath string){
   u.Path = "/auth/callback"
 
   p.RedirectURL = u.String()
-  auth.LoadProvider(Config.Auth.Provider, &p, ConfigInterface)
+  auth.Provider = auth.LoadProvider(Config.Auth.Provider, p, ConfigInterface)
 
 }

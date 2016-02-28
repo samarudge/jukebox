@@ -13,6 +13,7 @@ func Start(bind string){
 
   d := db.Db()
   d.AutoMigrate(&models.User{})
+  d.AutoMigrate(&models.Oauth2{})
 
   router.Use(helpers.Logger())
   router.Use(gin.Recovery())

@@ -6,7 +6,7 @@ import(
 )
 
 func loadJobs(){
-  gocron.Every(30).Seconds().Do(models.JobRenewUserAuth)
+  gocron.Every(30).Seconds().Do(models.JobRenewAuth)
 
   gocron.Start()
 }

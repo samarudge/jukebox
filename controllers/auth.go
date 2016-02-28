@@ -33,7 +33,16 @@ func AuthCallback(c *gin.Context){
     }
 
     u := models.User{}
-    u.CreateOrUpdateFromToken(token)
+    err = u.LoginOrSignup(token)
+
+    if err != nil{
+      c.Status(403)
+      helpers.Render(c, "error.html", gin.H{
+        "errorTitle": "Error during authentication",
+        "errorDetails": err,
+      })
+      return
+    }
 
     cookieVal := helpers.SignValue(strconv.FormatUint(uint64(u.ID), 10))
     c.SetCookie(

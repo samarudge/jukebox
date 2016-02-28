@@ -10,11 +10,10 @@ import(
 )
 
 type Google struct{
-  *BaseProvider
-  //UserData func(token *oauth2.Token) (UserData, error)
+  BaseProvider
 }
 
-func NewGoogle(p *BaseProvider, _ map[interface{}]interface{}) *Google{
+func NewGoogle(p BaseProvider, _ map[interface{}]interface{}) *Google{
   p.Name =        "Google Apps"
   p.AuthURL =     "https://accounts.google.com/o/oauth2/auth"
   p.TokenURL =    "https://www.googleapis.com/oauth2/v3/token"
@@ -26,13 +25,14 @@ func NewGoogle(p *BaseProvider, _ map[interface{}]interface{}) *Google{
   }
 }
 
-func (p *Google) GetUserData(token *oauth2.Token) (UserData, error){
+func (p *Google) GetUserData(token *oauth2.Token) (string, UserData, error){
   client := p.OauthClient(token)
   user := UserData{}
+  var ProviderId string
 
   rsp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
   if err != nil{
-    return user, err
+    return ProviderId, user, err
   }
 
   log.WithFields(log.Fields{
@@ -46,15 +46,15 @@ func (p *Google) GetUserData(token *oauth2.Token) (UserData, error){
 
   if rsp.StatusCode == 200 {
     if err := json.Unmarshal(responseRaw, &userData); err != nil {
-      return user, fmt.Errorf("Could not decode JSON", string(responseRaw))
+      return ProviderId, user, fmt.Errorf("Could not decode JSON", string(responseRaw))
     }
 
-    user.ProviderId = userData["id"].(string)
+    ProviderId = p.MakeProviderId(userData["id"].(string))
     user.ProfilePhoto = userData["picture"].(string)
     user.Name = userData["name"].(string)
   } else {
-    return user, fmt.Errorf("Could not get user data: %s %s", rsp.StatusCode, responseRaw)
+    return ProviderId, user, fmt.Errorf("Could not get user data: %s %s", rsp.StatusCode, responseRaw)
   }
 
-  return user, nil
+  return ProviderId, user, nil
 }

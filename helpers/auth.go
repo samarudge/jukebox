@@ -66,33 +66,22 @@ func Auth() gin.HandlerFunc{
 
       u := models.User{}
       u.ById(authUserId)
+      a := u.Auth()
 
-      if err != nil || d.NewRecord(u) || ! u.AuthValid{
+      if err != nil || d.NewRecord(u) || ! a.AuthValid{
         log.WithFields(log.Fields{
           "authCookie": authUserCookie,
           "error": err,
+          "userNew": d.NewRecord(u),
+          "authNew": d.NewRecord(a),
+          "authValid": a.AuthValid,
         }).Warning("Invalid user cookie")
 
         ClearAuthCookie(c)
       } else {
-        if u.TokenExpires.Sub(time.Now().UTC()).Minutes() < 5{
-          err := u.RenewAuthToken()
-
-          if err != nil{
-            ClearAuthCookie(c)
-            c.Status(500)
-            Render(c, "error.html", gin.H{
-              "errorTitle": "Token Refresh Error",
-              "errorDetails": err,
-            })
-            c.Abort()
-            return
-          }
-        }
-
-        authExpiry := u.LastAuth.Add(auth.Provider.Provider().ReauthEvery).Sub(time.Now().UTC()).Minutes()
+        authExpiry := a.LastAuth.Add(auth.Provider.Provider().ReauthEvery).Sub(time.Now().UTC()).Minutes()
         if authExpiry <= 0{
-          err := u.CheckAuth()
+          _, err := a.EnsureAuth(a.CreateToken())
           if err != nil{
             ClearAuthCookie(c)
             c.Status(500)
