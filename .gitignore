@@ -4,3 +4,5 @@ pkg/
 /environment.sh
 /config.yml
 /vendor/
+/output/
+/.tools/
