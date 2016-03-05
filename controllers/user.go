@@ -4,6 +4,7 @@ import(
   "github.com/gin-gonic/gin"
   "github.com/samarudge/jukebox/helpers"
   "github.com/samarudge/jukebox/models"
+  "github.com/samarudge/jukebox/db"
 )
 
 func UserInfo(c *gin.Context){
@@ -30,4 +31,14 @@ func UserRenewToken(c *gin.Context){
   } else {
     c.Redirect(302, u.ProfileLink())
   }
+}
+
+func UserList(c *gin.Context){
+  d := db.Db()
+
+  var users []models.User
+  d.Order("name").Find(&users)
+  helpers.Render(c, "users/list.html", gin.H{
+    "users": users,
+  })
 }

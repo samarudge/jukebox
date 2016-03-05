@@ -15,8 +15,9 @@ func loadRoutes(router *gin.Engine){
   router.POST("/rooms", helpers.RequireAuth(), controllers.RoomCreate)
   router.POST("/rooms/:roomId/join", helpers.RequireAuth(), controllers.RoomJoin)
 
-  userActions := router.Group("/users")
-  userActions.Use(helpers.AuthorizedUser())
-  userActions.GET("/:userId", controllers.UserInfo)
-  userActions.POST("/:userId/renewToken", controllers.UserRenewToken)
+  router.GET("/admin", helpers.RequireAdmin(), controllers.AdminIndex)
+
+  router.GET("/users", helpers.RequireAdmin(), controllers.UserList)
+  router.GET("/users/:userId", helpers.AuthorizedUser(), controllers.UserInfo)
+  router.POST("/users/:userId/renewToken", helpers.AuthorizedUser(), controllers.UserRenewToken)
 }

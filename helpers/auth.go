@@ -77,6 +77,26 @@ func RequireRoom() gin.HandlerFunc{
   }
 }
 
+func RequireAdmin() gin.HandlerFunc{
+  return func(c *gin.Context){
+    userId, _ := c.Get("authUserId")
+    u := models.User{}
+
+    if userId != nil{
+      u = c.MustGet("authUser").(models.User)
+    }
+
+    d := db.Db()
+    if d.NewRecord(u) || !u.IsAdmin {
+      c.Status(403)
+      Render(c, "needLogin.html", gin.H{})
+      c.Abort()
+    } else {
+      c.Next()
+    }
+  }
+}
+
 func Auth() gin.HandlerFunc{
   /*
     Process authentication data

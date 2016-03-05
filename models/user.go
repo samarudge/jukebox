@@ -17,6 +17,7 @@ type User struct{
   Oauth2ID      uint64
   RoomID        uint64
   LastSeen      time.Time
+  IsAdmin       bool
 }
 
 func (u *User) ById(userId string){
@@ -29,7 +30,7 @@ func (u *User) ByAuth(a *Oauth2){
   d.Where("oauth2_id = ?", a.ID).First(&u)
 }
 
-func (u *User) Auth() Oauth2{
+func (u User) Auth() Oauth2{
   d := db.Db()
   a := Oauth2{}
   d.Model(&u).Related(&a)
@@ -52,6 +53,14 @@ func (u *User) LoginOrSignup(token *oauth2.Token) error{
 
   if d.NewRecord(u) {
     u.Oauth2 = a
+
+    userCount := 0
+    d.Find(&User{}).Count(&userCount)
+    if userCount == 0{
+      log.Info("First user, promoting to admin")
+      u.IsAdmin = true
+    }
+
     d.Create(&u)
 
     log.WithFields(log.Fields{

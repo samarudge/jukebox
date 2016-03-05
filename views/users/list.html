@@ -1,0 +1,21 @@
+<div class="row">
+  <table class="table table-striped table-bordered">
+    <tr>
+      <th>Name</th>
+      <th>Provider</th>
+      <th>Auth Expires</th>
+      <th>Last Seen</th>
+      <th></th>
+    </tr>
+
+    {{#users}}
+      <tr>
+        <td>{{Name}} ({{Username}})</td>
+        <td>{{Auth.Provider}}</td>
+        <td>{{Auth.AuthExpiresIn}}</td>
+        <td>{{LastSeenStamp}}</td>
+        <td><a class="btn btn-info" href="{{Url}}">Manage</a></td>
+      </tr>
+    {{/users}}
+  </table>
+</div>

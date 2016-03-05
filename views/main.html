@@ -17,6 +17,10 @@
           <a href="{{authUser.ProfileLink}}/tracks">My Tracks</a>
         <li>
           <a href="/rooms">Rooms</a>
+        {{#authUser.IsAdmin}}
+          <li>
+            <a href="/admin">Admin</a>
+        {{/authUser.IsAdmin}}
       </ul>
 
       {{#authUser}}
