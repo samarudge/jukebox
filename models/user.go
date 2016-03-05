@@ -15,6 +15,7 @@ type User struct{
   auth.UserData
   Oauth2        Oauth2
   Oauth2ID      uint64
+  RoomID        uint64
   LastSeen      time.Time
 }
 

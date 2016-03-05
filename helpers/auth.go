@@ -50,6 +50,33 @@ func AuthorizedUser() gin.HandlerFunc{
   }
 }
 
+func RequireAuth() gin.HandlerFunc{
+  return func(c *gin.Context){
+    userId, _ := c.Get("authUserId")
+
+    if userId == nil {
+      c.Status(403)
+      Render(c, "needLogin.html", gin.H{})
+      c.Abort()
+    } else {
+      c.Next()
+    }
+  }
+}
+
+func RequireRoom() gin.HandlerFunc{
+  return func(c *gin.Context){
+    room, _ := c.Get("currentRoom")
+
+    if room == nil{
+      c.Redirect(302, "/rooms")
+      c.Abort()
+    } else {
+      c.Next()
+    }
+  }
+}
+
 func Auth() gin.HandlerFunc{
   /*
     Process authentication data
@@ -96,6 +123,17 @@ func Auth() gin.HandlerFunc{
 
         c.Set("authUserId", authUserId)
         c.Set("authUser", u)
+
+        room := models.Room{}
+        room.ById(strconv.FormatUint(uint64(u.RoomID), 10))
+        if !d.NewRecord(room){
+          log.WithFields(log.Fields{
+            "userId": u.ID,
+            "roomId": room.ID,
+            "room": room.Name,
+          }).Debug("Loaded active room")
+          c.Set("currentRoom", room)
+        }
 
         if time.Now().UTC().Sub(u.LastSeen).Minutes() > 5 {
           log.WithFields(log.Fields{

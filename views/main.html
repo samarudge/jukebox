@@ -15,6 +15,8 @@
           <a href="/popular">Popular</a>
         <li>
           <a href="{{authUser.ProfileLink}}/tracks">My Tracks</a>
+        <li>
+          <a href="/rooms">Rooms</a>
       </ul>
 
       {{#authUser}}
@@ -36,6 +38,10 @@
       {{^authUser}}
         <a href="{{loginLink}}" class="btn btn-default navbar-btn navbar-right">Login With {{authProvider.Name}}</a>
       {{/authUser}}
+
+      {{#currentRoom}}
+        <p class="navbar-text navbar-right">Currently in {{currentRoom.Name}}
+      {{/currentRoom}}
     </div>
   </nav>
 

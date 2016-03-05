@@ -5,6 +5,6 @@ import(
   "github.com/samarudge/jukebox/helpers"
 )
 
-func RoomList(c *gin.Context){
+func Index(c *gin.Context){
   helpers.Render(c, "index.html", gin.H{})
 }

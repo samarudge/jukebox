@@ -7,9 +7,13 @@ import(
 )
 
 func loadRoutes(router *gin.Engine){
-  router.GET("/", controllers.RoomList)
+  router.GET("/", helpers.RequireRoom(), controllers.Index)
   router.GET("/auth/callback", controllers.AuthCallback)
   router.GET("/auth/logout", controllers.AuthLogout)
+
+  router.GET("/rooms", controllers.RoomList)
+  router.POST("/rooms", helpers.RequireAuth(), controllers.RoomCreate)
+  router.POST("/rooms/:roomId/join", helpers.RequireAuth(), controllers.RoomJoin)
 
   userActions := router.Group("/users")
   userActions.Use(helpers.AuthorizedUser())
