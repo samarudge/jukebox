@@ -134,7 +134,7 @@ func JobRenewAuth(){
   d := db.Db()
   var authCount int
 
-  authQuery := d.Where("last_auth < ?", authFilter)
+  authQuery := d.Where("last_auth < ? and auth_valid = ?", authFilter, true)
   authQuery.Find(&auths).Count(&authCount)
 
   if authCount > 0{

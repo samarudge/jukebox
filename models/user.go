@@ -45,13 +45,13 @@ func (u *User) LoginOrSignup(token *oauth2.Token) error{
   }
 
   d := db.Db()
-  d.Where("oauth2id = ?", a.ID).First(&u)
+  d.Where("oauth2_id = ?", a.ID).First(&u)
   d.Model(&u).Related(&a)
 
-  u.Model = gorm.Model{}
   u.UserData = UserData
 
   if d.NewRecord(u) {
+    u.Model = gorm.Model{}
     u.Oauth2 = a
 
     userCount := 0

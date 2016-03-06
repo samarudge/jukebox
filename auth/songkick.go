@@ -58,7 +58,7 @@ func (p *Songkick) GetUserData(token *oauth2.Token) (string, UserData, error){
   log.WithFields(log.Fields{
     "call": rsp.Request.URL,
     "status": rsp.StatusCode,
-  }).Info("User Data Songkick")
+  }).Debug("User Data Songkick")
 
   defer rsp.Body.Close()
   responseRaw, _ := ioutil.ReadAll(rsp.Body)

@@ -38,7 +38,7 @@ func (p *Google) GetUserData(token *oauth2.Token) (string, UserData, error){
   log.WithFields(log.Fields{
     "call": rsp.Request.URL,
     "status": rsp.StatusCode,
-  }).Info("User Data Google")
+  }).Debug("User Data Google")
 
   defer rsp.Body.Close()
   responseRaw, _ := ioutil.ReadAll(rsp.Body)
