@@ -18,6 +18,7 @@ func loadRoutes(router *gin.Engine){
   router.GET("/admin", helpers.RequireAdmin(), controllers.AdminIndex)
 
   router.GET("/users", helpers.RequireAdmin(), controllers.UserList)
-  router.GET("/users/:userId", helpers.AuthorizedUser(), controllers.UserInfo)
+  router.GET("/users/:userId", helpers.AuthorizedUser(), controllers.UserContext, controllers.UserInfo)
+  router.POST("/users/:userId", helpers.AuthorizedUser(), controllers.UserContext, controllers.UserUpdate)
   router.POST("/users/:userId/renewToken", helpers.AuthorizedUser(), controllers.UserRenewToken)
 }

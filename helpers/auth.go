@@ -36,7 +36,7 @@ func AuthorizedUser() gin.HandlerFunc{
       authUser = userInterface.(models.User)
     }
 
-    if userId != strconv.FormatUint(uint64(authUser.ID), 10) {
+    if userId != strconv.FormatUint(uint64(authUser.ID), 10) && !authUser.IsAdmin {
       c.Status(403)
       Render(c, "error.html", gin.H{
         "errorTitle": "Authentication Error",
@@ -44,7 +44,6 @@ func AuthorizedUser() gin.HandlerFunc{
       })
       c.Abort()
     } else {
-      c.Set("userControllerRequest", authUser)
       c.Next()
     }
   }
@@ -143,6 +142,12 @@ func Auth() gin.HandlerFunc{
 
         c.Set("authUserId", authUserId)
         c.Set("authUser", u)
+
+        if u.IsAdmin{
+          c.Set("isAdmin", true)
+        } else {
+          c.Set("isAdmin", false)
+        }
 
         room := models.Room{}
         room.ById(strconv.FormatUint(uint64(u.RoomID), 10))

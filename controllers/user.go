@@ -5,10 +5,29 @@ import(
   "github.com/samarudge/jukebox/helpers"
   "github.com/samarudge/jukebox/models"
   "github.com/samarudge/jukebox/db"
+  "fmt"
+  log "github.com/Sirupsen/logrus"
 )
 
+func UserContext(c *gin.Context){
+  userId := c.Param("userId")
+  u := models.User{}
+  u.ById(userId)
+  if u.ID == 0{
+    c.Status(404)
+    helpers.Render(c, "error.html", gin.H{
+      "errorTitle": "Not Found",
+      "errorDetails": "User was not found",
+    })
+    c.Abort()
+  } else {
+    c.Set("contextUser", u)
+    c.Next()
+  }
+}
+
 func UserInfo(c *gin.Context){
-  u := c.MustGet("userControllerRequest").(models.User)
+  u := c.MustGet("contextUser").(models.User)
   a := u.Auth()
 
   helpers.Render(c, "users/info.html", gin.H{
@@ -17,8 +36,32 @@ func UserInfo(c *gin.Context){
   })
 }
 
+func UserUpdate(c *gin.Context){
+  u := c.MustGet("contextUser").(models.User)
+
+  adminStr := fmt.Sprintf("%t", u.IsAdmin)
+  isAdmin := c.DefaultPostForm("IsAdmin", adminStr)
+  authUserAdmin, _ := c.Get("isAdmin")
+  if isAdmin != adminStr && authUserAdmin.(bool){
+    log.WithFields(log.Fields{
+      "newStatus": isAdmin,
+      "currentStatus": adminStr,
+    }).Debug("Changing user admin state")
+
+    if isAdmin == "true"{
+      u.IsAdmin = true
+    } else {
+      u.IsAdmin = false
+    }
+  }
+
+  d := db.Db()
+  d.Save(&u)
+  c.Redirect(302, u.ProfileLink())
+}
+
 func UserRenewToken(c *gin.Context){
-  u := c.MustGet("userControllerRequest").(models.User)
+  u := c.MustGet("contextUser").(models.User)
   a := u.Auth()
   err := a.RenewAuthToken()
 

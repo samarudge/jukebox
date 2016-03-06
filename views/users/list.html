@@ -5,6 +5,7 @@
       <th>Provider</th>
       <th>Auth Expires</th>
       <th>Last Seen</th>
+      <th>Admin</th>
       <th></th>
     </tr>
 
@@ -14,6 +15,13 @@
         <td>{{Auth.Provider}}</td>
         <td>{{Auth.AuthExpiresIn}}</td>
         <td>{{LastSeenStamp}}</td>
+        <td>
+          {{#IsAdmin}}
+            <span class="glyphicon glyphicon-ok"></span>
+          {{/IsAdmin}}
+          {{^IsAdmin}}
+            <span class="glyphicon glyphicon-remove"></span>
+          {{/IsAdmin}}
         <td><a class="btn btn-info" href="{{ProfileLink}}">Manage</a></td>
       </tr>
     {{/users}}

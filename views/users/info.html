@@ -31,6 +31,30 @@
         <td>{{auth.AuthExpiresIn}}</td>
       </tr>
       <tr>
+        <th>Admin</th>
+        <td>
+          {{#user.IsAdmin}}
+            <span class="glyphicon glyphicon-ok"></span>
+          {{/user.IsAdmin}}
+          {{^user.IsAdmin}}
+            <span class="glyphicon glyphicon-remove"></span>
+          {{/user.IsAdmin}}
+
+          {{#authUser.IsAdmin}}
+            <form method="post" action="{{user.ProfileLink}}">
+              {{#user.IsAdmin}}
+                <input type="hidden" name="IsAdmin" value="false" />
+                <input type="submit" name="renew" value="Remove Admin" class="btn btn-warning" />
+              {{/user.IsAdmin}}
+              {{^user.IsAdmin}}
+                <input type="hidden" name="IsAdmin" value="true" />
+                <input type="submit" name="renew" value="Make Admin" class="btn btn-warning" />
+              {{/user.IsAdmin}}
+            </form>
+          {{/authUser.IsAdmin}}
+        </td>
+      </tr>
+      <tr>
         <th>Oauth Expires</th>
         <td>
           <p>{{auth.TokenExpiresIn}}
