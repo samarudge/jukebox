@@ -14,12 +14,7 @@ func UserContext(c *gin.Context){
   u := models.User{}
   u.ById(userId)
   if u.ID == 0{
-    c.Status(404)
-    helpers.Render(c, "error.html", gin.H{
-      "errorTitle": "Not Found",
-      "errorDetails": "User was not found",
-    })
-    c.Abort()
+    helpers.Send404(c, "User not found")
   } else {
     c.Set("contextUser", u)
     c.Next()
@@ -66,11 +61,7 @@ func UserRenewToken(c *gin.Context){
   err := a.RenewAuthToken()
 
   if err != nil{
-    c.Status(500)
-    helpers.Render(c, "error.html", gin.H{
-      "errorTitle": "Token Renew Error",
-      "errorDetails": err,
-    })
+    helpers.Send500(c, fmt.Sprintf("%s (%s)", "Token renew failure", err))
   } else {
     c.Redirect(302, u.ProfileLink())
   }

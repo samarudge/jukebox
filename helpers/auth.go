@@ -9,6 +9,7 @@ import(
   "time"
   "strconv"
   "net/url"
+  "fmt"
 )
 
 func ClearAuthCookie(c *gin.Context){
@@ -37,12 +38,7 @@ func AuthorizedUser() gin.HandlerFunc{
     }
 
     if userId != strconv.FormatUint(uint64(authUser.ID), 10) && !authUser.IsAdmin {
-      c.Status(403)
-      Render(c, "error.html", gin.H{
-        "errorTitle": "Authentication Error",
-        "errorDetails": "You are not authorized to view this user",
-      })
-      c.Abort()
+      Send403(c, "You are not authorized to view this uer")
     } else {
       c.Next()
     }
@@ -54,9 +50,7 @@ func RequireAuth() gin.HandlerFunc{
     userId, _ := c.Get("authUserId")
 
     if userId == nil {
-      c.Status(403)
-      Render(c, "needLogin.html", gin.H{})
-      c.Abort()
+      Send403(c, "You must log in to view this page")
     } else {
       c.Next()
     }
@@ -87,9 +81,7 @@ func RequireAdmin() gin.HandlerFunc{
 
     d := db.Db()
     if d.NewRecord(u) || !u.IsAdmin {
-      c.Status(403)
-      Render(c, "needLogin.html", gin.H{})
-      c.Abort()
+      Send403(c, "You must log in to view this page")
     } else {
       c.Next()
     }
@@ -130,12 +122,7 @@ func Auth() gin.HandlerFunc{
           _, err := a.EnsureAuth(a.CreateToken())
           if err != nil{
             ClearAuthCookie(c)
-            c.Status(500)
-            Render(c, "error.html", gin.H{
-              "errorTitle": "Reauth Error",
-              "errorDetails": err,
-            })
-            c.Abort()
+            Send500(c, fmt.Sprintf("%s (%s)", "Reauth Error", err))
             return
           }
         }

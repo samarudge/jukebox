@@ -5,6 +5,7 @@ import(
   "github.com/samarudge/jukebox/helpers"
   "github.com/samarudge/jukebox/models"
   "github.com/samarudge/jukebox/db"
+  "fmt"
 )
 
 func RoomCreate(c *gin.Context){
@@ -27,12 +28,7 @@ func loadRoom(c *gin.Context) (models.Room, bool){
   r.ById(c.Param("roomId"))
 
   if d.NewRecord(r){
-    c.Status(404)
-    helpers.Render(c, "error.html", gin.H{
-      "errorTitle": "Room Not Found",
-      "errorDetails": "Room was not found",
-    })
-    c.Abort()
+    helpers.Send404(c, "Room not found")
     return r, false
   }
   return r, true
@@ -48,11 +44,7 @@ func RoomJoin(c *gin.Context){
 
   err := room.JoinUser(u)
   if err != nil{
-    c.Status(500)
-    helpers.Render(c, "error.html", gin.H{
-      "errorTitle": "Error joining room",
-      "errorDetails": err,
-    })
+    helpers.Send500(c, fmt.Sprintf("%s (%s)", "Error during authentication", err))
   } else {
     c.Redirect(302, "/")
   }

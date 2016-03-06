@@ -15,10 +15,15 @@ func loadRoutes(router *gin.Engine){
   router.POST("/rooms", helpers.RequireAuth(), controllers.RoomCreate)
   router.POST("/rooms/:roomId/join", helpers.RequireAuth(), controllers.RoomJoin)
 
-  router.GET("/admin", helpers.RequireAdmin(), controllers.AdminIndex)
+  adminRoutes := router.Group("/")
+  adminRoutes.Use(helpers.RequireAdmin())
+  adminRoutes.GET("/admin", controllers.AdminIndex)
+  adminRoutes.GET("/users", controllers.UserList)
 
-  router.GET("/users", helpers.RequireAdmin(), controllers.UserList)
-  router.GET("/users/:userId", helpers.AuthorizedUser(), controllers.UserContext, controllers.UserInfo)
-  router.POST("/users/:userId", helpers.AuthorizedUser(), controllers.UserContext, controllers.UserUpdate)
-  router.POST("/users/:userId/renewToken", helpers.AuthorizedUser(), controllers.UserRenewToken)
+  userRoutes := router.Group("/users")
+  userRoutes.Use(helpers.AuthorizedUser())
+  userRoutes.Use(controllers.UserContext)
+  userRoutes.GET("/:userId", controllers.UserInfo)
+  userRoutes.POST("/:userId", controllers.UserUpdate)
+  userRoutes.POST("/:userId/renewToken", controllers.UserRenewToken)
 }

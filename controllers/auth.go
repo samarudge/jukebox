@@ -7,6 +7,7 @@ import(
   "github.com/samarudge/jukebox/models"
   "strconv"
   "net/url"
+  "fmt"
 )
 
 func AuthCallback(c *gin.Context){
@@ -15,20 +16,12 @@ func AuthCallback(c *gin.Context){
   token, err := auth.Provider.DoExchange(code)
 
   if err != nil{
-    c.Status(500)
-    helpers.Render(c, "error.html", gin.H{
-      "errorTitle": "Error during authentication",
-      "errorDetails": err,
-    })
+    helpers.Send500(c, fmt.Sprintf("%s (%s)", "Error during authentication", err))
   } else {
     stateRaw := c.DefaultQuery("state", "")
     state, err := helpers.VerifyValue(stateRaw)
     if err != nil{
-      c.Status(403)
-      helpers.Render(c, "error.html", gin.H{
-        "errorTitle": "Error during authentication",
-        "errorDetails": "State mismatch",
-      })
+      helpers.Send403(c, "State mismatch")
       return
     }
 
@@ -36,11 +29,7 @@ func AuthCallback(c *gin.Context){
     err = u.LoginOrSignup(token)
 
     if err != nil{
-      c.Status(403)
-      helpers.Render(c, "error.html", gin.H{
-        "errorTitle": "Error during authentication",
-        "errorDetails": err,
-      })
+      helpers.Send500(c, fmt.Sprintf("%s (%s)", "Error during authentication", err))
       return
     }
 
