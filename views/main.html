@@ -40,7 +40,17 @@
         </ul>
       {{/authUser}}
       {{^authUser}}
-        <a href="{{loginLink}}" class="btn btn-default navbar-btn navbar-right">Login With {{authProvider.Name}}</a>
+        <div class="btn-group navbar-right">
+          <button class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown">
+            Login <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            {{#loginLinks}}
+              <li>
+                <a href="{{loginLink}}">with {{name}}</a>
+            {{/loginLinks}}
+          </ul>
+        </div>
       {{/authUser}}
 
       {{#currentRoom}}

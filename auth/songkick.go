@@ -21,16 +21,18 @@ func NewSongkick(p BaseProvider, additionalConfig map[interface{}]interface{}) *
   p.Name =      "Songkick"
   p.AuthURL =   "https://www.songkick.com/oauth/login"
   p.TokenURL =  "https://www.songkick.com/oauth/exchange"
-  p.ReauthEvery = time.Minute*15
+  p.ReauthEvery = time.Minute*30
 
   var apiKey string
-  authConfig := additionalConfig["auth"].(map[interface{}]interface{})
+  authConfig := additionalConfig["auth"].(map[interface{}]interface{})["songkick"].(map[interface{}]interface{})
   _, hasApiKey := authConfig["api_key"]
   if hasApiKey{
     apiKey = authConfig["api_key"].(string)
   } else {
-    apiKey = ""
+    panic("Did not provide Songkick API key")
   }
+
+  fmt.Println("API Key:", apiKey)
 
   return &Songkick{
     BaseProvider: p,

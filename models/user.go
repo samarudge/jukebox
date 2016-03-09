@@ -37,8 +37,9 @@ func (u User) Auth() Oauth2{
   return a
 }
 
-func (u *User) LoginOrSignup(token *oauth2.Token) error{
+func (u *User) LoginOrSignup(p auth.OauthProvider, token *oauth2.Token) error{
   a := Oauth2{}
+  a.Provider = p.ProviderSlug()
   UserData, err := a.EnsureAuth(token)
   if err != nil{
     return err

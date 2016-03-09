@@ -94,8 +94,6 @@ func Auth() gin.HandlerFunc{
   */
 
   return func(c *gin.Context) {
-    c.Set("authProvider", auth.Provider.Provider())
-
     authUserCookie, err := c.Cookie("jukebox_user")
     if err == nil{
       authUserId, err := VerifyValue(authUserCookie)
@@ -117,7 +115,8 @@ func Auth() gin.HandlerFunc{
 
         ClearAuthCookie(c)
       } else {
-        authExpiry := a.LastAuth.Add(auth.Provider.Provider().ReauthEvery).Sub(time.Now().UTC()).Minutes()
+        provider := a.LoadProvider()
+        authExpiry := a.LastAuth.Add(provider.Provider().ReauthEvery).Sub(time.Now().UTC()).Minutes()
         if authExpiry <= 0{
           _, err := a.EnsureAuth(a.CreateToken())
           if err != nil{
@@ -161,7 +160,25 @@ func Auth() gin.HandlerFunc{
 
     from := c.Request.URL.String()
     pageFrom := SignValue(from)
-    c.Set("loginLink", auth.Provider.LoginLink(pageFrom))
+
+    var loginLinks []map[string]string
+
+    for _,providerName := range auth.ConfiguredProviders{
+      p := auth.Providers[providerName]
+
+      providerLoginLink := url.URL{}
+      providerLoginLink.Path = "/auth/login"
+      q := providerLoginLink.Query()
+      q.Set("from", pageFrom)
+      q.Set("provider", providerName)
+      providerLoginLink.RawQuery = q.Encode()
+
+      loginLinks = append(loginLinks, map[string]string{
+        "name": p.Provider().Name,
+        "loginLink": providerLoginLink.String(),
+      })
+    }
+    c.Set("loginLinks", loginLinks)
 
     logoutLink := url.URL{}
     logoutLink.Path = "/auth/logout"

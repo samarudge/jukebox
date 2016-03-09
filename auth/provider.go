@@ -8,7 +8,8 @@ import (
   "github.com/Machiel/slugify"
 )
 
-var Provider OauthProvider
+var ConfiguredProviders []string
+var Providers = make(map[string]OauthProvider)
 
 func LoadProvider(providerName string, p BaseProvider, additionalConfig map[interface{}]interface{}) OauthProvider{
   providers := []OauthProvider{NewGoogle(p, additionalConfig),NewSongkick(p, additionalConfig)}

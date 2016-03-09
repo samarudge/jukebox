@@ -21,6 +21,11 @@ type Oauth2 struct{
   TokenExpires  time.Time
 }
 
+func (a *Oauth2) LoadProvider() auth.OauthProvider{
+  p := auth.Providers[a.Provider]
+  return p
+}
+
 func (a *Oauth2) ExpiringToken() bool{
   return !(a.RefreshToken == "" && a.TokenExpires.IsZero())
 }
@@ -40,7 +45,9 @@ func (a *Oauth2) EnsureAuth(token *oauth2.Token) (auth.UserData, error){
     }
   }
 
-  providerId, userData, err := auth.Provider.GetUserData(token)
+  provider := a.LoadProvider()
+
+  providerId, userData, err := provider.GetUserData(token)
   d.Where("provider_id = ?", providerId).First(&a)
 
   if err != nil{
@@ -59,7 +66,7 @@ func (a *Oauth2) EnsureAuth(token *oauth2.Token) (auth.UserData, error){
   a.LastAuth = time.Now().UTC()
 
   if d.NewRecord(a){
-    a.Provider = auth.Provider.ProviderSlug()
+    a.Provider = provider.ProviderSlug()
   }
 
   d.Save(&a)
@@ -79,6 +86,7 @@ func (a *Oauth2) CreateToken() *oauth2.Token{
 }
 
 func (a *Oauth2) RenewAuthToken() error{
+  provider := a.LoadProvider()
   if !a.ExpiringToken(){
     return nil
   }
@@ -90,7 +98,7 @@ func (a *Oauth2) RenewAuthToken() error{
   tkn := a.CreateToken()
   tkn.Expiry = time.Now().Add(time.Minute*-5)
 
-  c := auth.Provider.OauthConfig()
+  c := provider.OauthConfig()
   tks := c.TokenSource(oauth2.NoContext, tkn)
   newToken, err := tks.Token()
 
@@ -125,38 +133,40 @@ func (a Oauth2) TokenExpiresIn() string{
 }
 
 func (a Oauth2) AuthExpiresIn() string{
-  return readableExpiry(a.LastAuth.Add(auth.Provider.Provider().ReauthEvery))
+  return readableExpiry(a.LastAuth.Add(auth.Providers[a.Provider].Provider().ReauthEvery))
 }
 
 func JobRenewAuth(){
-  authFilter := time.Now().UTC().Add(auth.Provider.Provider().ReauthEvery*-1)
-  auths := []Oauth2{}
-  d := db.Db()
-  var authCount int
+  for _,provider := range auth.ConfiguredProviders{
+    authFilter := time.Now().UTC().Add(auth.Providers[provider].Provider().ReauthEvery*-1)
+    auths := []Oauth2{}
+    d := db.Db()
+    var authCount int
 
-  authQuery := d.Where("last_auth < ? and auth_valid = ?", authFilter, true)
-  authQuery.Find(&auths).Count(&authCount)
+    authQuery := d.Where("last_auth < ? and auth_valid = ? and provider = ?", authFilter, true, provider)
+    authQuery.Find(&auths).Count(&authCount)
 
-  if authCount > 0{
-    log.WithFields(log.Fields{
-      "authCount":authCount,
-    }).Debug("Renewing auth")
-
-    for i,_ := range auths{
-      a := auths[i]
+    if authCount > 0{
       log.WithFields(log.Fields{
-        "auth": a.ID,
-        "provider": a.Provider,
-        "expired": a.AuthExpiresIn(),
-      }).Debug("Doing reauth")
+        "authCount":authCount,
+      }).Debug("Renewing auth")
 
-      t := a.CreateToken()
-      _, err := a.EnsureAuth(t)
-      if err != nil{
+      for i,_ := range auths{
+        a := auths[i]
         log.WithFields(log.Fields{
           "auth": a.ID,
-          "err": err,
-        }).Warning("Could not do reauth")
+          "provider": a.Provider,
+          "expired": a.AuthExpiresIn(),
+        }).Debug("Doing reauth")
+
+        t := a.CreateToken()
+        _, err := a.EnsureAuth(t)
+        if err != nil{
+          log.WithFields(log.Fields{
+            "auth": a.ID,
+            "err": err,
+          }).Warning("Could not do reauth")
+        }
       }
     }
   }

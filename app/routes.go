@@ -8,7 +8,8 @@ import(
 
 func loadRoutes(router *gin.Engine){
   router.GET("/", helpers.RequireRoom(), controllers.Index)
-  router.GET("/auth/callback", controllers.AuthCallback)
+  router.GET("/auth/login", controllers.AuthLogin)
+  router.GET("/auth/callback/:providerName", controllers.AuthCallback)
   router.GET("/auth/logout", controllers.AuthLogout)
 
   router.GET("/rooms", controllers.RoomList)

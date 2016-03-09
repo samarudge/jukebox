@@ -7,16 +7,14 @@ import(
   "io/ioutil"
   "github.com/samarudge/jukebox/auth"
   "net/url"
+  "fmt"
 )
 
 type config struct{
   Secret    string
   Url       string
   Auth      struct{
-    Provider        string
-    Client_id       string
-    Client_secret   string
-    Api_key         string
+    Configured_providers       []string
   }
 }
 
@@ -56,26 +54,30 @@ func Initialize(filePath string){
   // Validate config params
   if  Config.Secret == "" ||
       Config.Url == "" ||
-      Config.Auth.Provider == "" ||
-      Config.Auth.Client_id == "" ||
-      Config.Auth.Client_secret == "" {
+      len(Config.Auth.Configured_providers) == 0 {
 
       log.WithFields(log.Fields{
         "configFile": filePath,
         "error": "Invalid configuration provided",
+        "pl":len(Config.Auth.Configured_providers),
       }).Error("Could not load config file")
       os.Exit(1)
   }
 
-  // Load the auth provider
-  p := auth.BaseProvider{}
-  p.ClientId = Config.Auth.Client_id
-  p.ClientSecret = Config.Auth.Client_secret
+  // Load the auth providers
+  for _,providerName := range Config.Auth.Configured_providers{
+    providerConfig := ConfigInterface["auth"].(map[interface{}]interface{})[providerName].(map[interface{}]interface{})
+    p := auth.BaseProvider{}
+    p.ClientId = providerConfig["client_id"].(string)
+    p.ClientSecret = providerConfig["client_secret"].(string)
 
-  u, _ := url.Parse(Config.Url)
-  u.Path = "/auth/callback"
+    u, _ := url.Parse(Config.Url)
+    u.Path = fmt.Sprintf("/auth/callback/%s", providerName)
 
-  p.RedirectURL = u.String()
-  auth.Provider = auth.LoadProvider(Config.Auth.Provider, p, ConfigInterface)
+    p.RedirectURL = u.String()
 
+    auth.Providers[providerName] = auth.LoadProvider(providerName, p, ConfigInterface)
+  }
+
+  auth.ConfiguredProviders = Config.Auth.Configured_providers
 }

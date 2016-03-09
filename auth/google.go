@@ -18,7 +18,7 @@ func NewGoogle(p BaseProvider, _ map[interface{}]interface{}) *Google{
   p.AuthURL =     "https://accounts.google.com/o/oauth2/auth"
   p.TokenURL =    "https://www.googleapis.com/oauth2/v3/token"
   p.Scopes =      []string{"profile", "email"}
-  p.ReauthEvery = time.Minute*15
+  p.ReauthEvery = time.Minute*30
 
   return &Google{
     BaseProvider: p,
@@ -52,6 +52,7 @@ func (p *Google) GetUserData(token *oauth2.Token) (string, UserData, error){
     ProviderId = p.MakeProviderId(userData["id"].(string))
     user.ProfilePhoto = userData["picture"].(string)
     user.Name = userData["name"].(string)
+    user.Username = userData["email"].(string)
   } else {
     return ProviderId, user, fmt.Errorf("Could not get user data: %s %s", rsp.StatusCode, responseRaw)
   }

@@ -1,1 +1,12 @@
-<a href="/users">Manage Users</a>
+
+<div class="row">
+  <div class="col-md-6">
+    <a href="/users">Manage Users</a>
+  </div>
+
+  <div class="col-md-6">
+    {{^spotifyConfigured}}
+      <a class="btn btn-primary" href="{{spotifyLoginLink}}">Link system Spotify account</a>
+    {{/spotifyConfigured}}
+  </div>
+</div>

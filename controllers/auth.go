@@ -10,10 +10,31 @@ import(
   "fmt"
 )
 
+func AuthLogin(c *gin.Context){
+  providerName := c.DefaultQuery("provider", "")
+  p, found := auth.Providers[providerName]
+  if !found{
+    helpers.Send404(c, "Invalid provider")
+    return
+  }
+
+  from := c.DefaultQuery("from", "")
+
+  loginLink := p.LoginLink(from)
+  c.Redirect(302, loginLink)
+}
+
 func AuthCallback(c *gin.Context){
   code := c.DefaultQuery("code", "")
+  providerName := c.Param("providerName")
 
-  token, err := auth.Provider.DoExchange(code)
+  provider, found := auth.Providers[providerName]
+  if found == false{
+    helpers.Send404(c, "Invalid provider")
+    return
+  }
+
+  token, err := provider.DoExchange(code)
 
   if err != nil{
     helpers.Send500(c, fmt.Sprintf("%s (%s)", "Error during authentication", err))
@@ -26,7 +47,7 @@ func AuthCallback(c *gin.Context){
     }
 
     u := models.User{}
-    err = u.LoginOrSignup(token)
+    err = u.LoginOrSignup(provider, token)
 
     if err != nil{
       helpers.Send500(c, fmt.Sprintf("%s (%s)", "Error during authentication", err))
