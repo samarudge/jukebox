@@ -5,6 +5,7 @@ import(
   log "github.com/Sirupsen/logrus"
   "gopkg.in/yaml.v2"
   "io/ioutil"
+  "github.com/samarudge/jukebox/db"
   "github.com/samarudge/jukebox/auth"
   "net/url"
   "fmt"
@@ -91,4 +92,7 @@ func Initialize(filePath string){
   }
 
   auth.ConfiguredProviders = Config.Auth.Configured_providers
+
+  //Open DB
+  db.OpenDB("./storage.db")
 }

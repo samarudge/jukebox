@@ -18,10 +18,21 @@ func (*GormLogger) Print(v ...interface{}) {
   }
 }
 
-func Db() (gorm.DB){
-  db, _ := gorm.Open("sqlite3", "storage.db")
+var gormDB gorm.DB
+
+func OpenDB(filePath string) error{
+  db, err := gorm.Open("sqlite3", filePath)
+
+  if err != nil{
+    return err
+  }
+
   db.SetLogger(&GormLogger{})
   db.LogMode(true)
+  gormDB = db
+  return nil
+}
 
-  return db
+func Db() (gorm.DB){
+  return gormDB
 }
