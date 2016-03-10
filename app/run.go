@@ -15,6 +15,7 @@ func Start(bind string){
   d.AutoMigrate(&models.User{})
   d.AutoMigrate(&models.Oauth2{})
   d.AutoMigrate(&models.Room{})
+  d.AutoMigrate(&models.Spotify{})
 
   router.Use(helpers.Logger())
   router.Use(gin.Recovery())

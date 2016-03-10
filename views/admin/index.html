@@ -2,11 +2,25 @@
 <div class="row">
   <div class="col-md-6">
     <a href="/users">Manage Users</a>
+    <a href="/auths">Manage Auths</a>
   </div>
 
   <div class="col-md-6">
-    {{^spotifyConfigured}}
-      <a class="btn btn-primary" href="{{spotifyLoginLink}}">Link system Spotify account</a>
-    {{/spotifyConfigured}}
+    <h1>System Settings</h1>
+    <table class="table table-striped">
+      <tr>
+        <th>System Spotify</th>
+        <td>
+          {{^spotifyConfigured}}
+            <b>Not Configured</b>
+          {{/spotifyConfigured}}
+          {{#spotifyConfigured}}
+            {{systemSpotify.Auth.Name}}
+          {{/spotifyConfigured}}
+
+          <a class="btn btn-primary pull-right" href="/auth/login?provider=spotify&amp;system_account=1">Link</a>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>

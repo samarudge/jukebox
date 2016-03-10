@@ -32,8 +32,6 @@ func NewSongkick(p BaseProvider, additionalConfig map[interface{}]interface{}) *
     panic("Did not provide Songkick API key")
   }
 
-  fmt.Println("API Key:", apiKey)
-
   return &Songkick{
     BaseProvider: p,
     ApiKey: apiKey,

@@ -27,12 +27,14 @@
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              Signed in as {{authUser.Name}}
+              Signed in as {{authUser.Auth.Name}}
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
               <li>
                 <a href="{{authUser.ProfileLink}}">Account Settings</a>
+              <li>
+                <a href="{{spotifyLogin}}">Link Spotify</a>
               <li role="separator" class="divider"></li>
               <li>
                 <a href="{{logoutLink}}">Logout</a>
@@ -60,6 +62,12 @@
   </nav>
 
   <div class="container">
+    {{^spotifyConfigured}}{{#isAdmin}}
+      <p class="alert alert-warning">
+        <b>Spotify Not Configured:</b>
+        You have not yet configured the system spotify account, you should <a href="/admin">go do that now</a>
+    {{/isAdmin}}{{/spotifyConfigured}}
+
     {{{content}}}
 
     <footer>

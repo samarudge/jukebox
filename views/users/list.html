@@ -1,19 +1,21 @@
 <div class="row">
   <table class="table table-striped table-bordered">
     <tr>
+      <th>ID</th>
+      <th>Auth</th>
       <th>Name</th>
       <th>Provider</th>
-      <th>Auth Expires</th>
       <th>Last Seen</th>
       <th>Admin</th>
-      <th></th>
+      <th>Spotify</th>
     </tr>
 
     {{#users}}
       <tr>
-        <td>{{Name}} ({{Username}})</td>
+        <td><a href="{{ProfileLink}}">{{ID}}</a></td>
+        <td><a href="{{Auth.Url}}">{{Auth.ID}}</a></td>
+        <td>{{Auth.Name}} ({{Auth.Username}})</td>
         <td>{{Auth.Provider}}</td>
-        <td>{{Auth.AuthExpiresIn}}</td>
         <td>{{LastSeenStamp}}</td>
         <td>
           {{#IsAdmin}}
@@ -22,7 +24,15 @@
           {{^IsAdmin}}
             <span class="glyphicon glyphicon-remove"></span>
           {{/IsAdmin}}
-        <td><a class="btn btn-info" href="{{ProfileLink}}">Manage</a></td>
+        </td>
+        <td>
+          {{#HasSpotify}}
+            <span class="glyphicon glyphicon-ok"></span>
+          {{/HasSpotify}}
+          {{^HasSpotify}}
+            <span class="glyphicon glyphicon-remove"></span>
+          {{/HasSpotify}}
+        </td>
       </tr>
     {{/users}}
   </table>

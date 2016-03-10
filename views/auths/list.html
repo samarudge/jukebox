@@ -1,0 +1,21 @@
+<div class="row">
+  <table class="table table-striped table-bordered">
+    <tr>
+      <th>ID</th>
+      <th>User</th>
+      <th>Provider</th>
+      <th>Provider ID</th>
+      <th>Auth Expires</th>
+    </tr>
+
+    {{#auths}}
+      <tr>
+        <td>{{ID}}</td>
+        <td><a href="{{User.ProfileLink}}">{{User.Auth.Name}}</a></td>
+        <td>{{Provider}}</td>
+        <td>{{ProviderId}}</td>
+        <td>{{AuthExpiresIn}}</td>
+      </tr>
+    {{/auths}}
+  </table>
+</div>

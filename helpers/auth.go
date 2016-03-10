@@ -173,10 +173,14 @@ func Auth() gin.HandlerFunc{
       q.Set("provider", providerName)
       providerLoginLink.RawQuery = q.Encode()
 
-      loginLinks = append(loginLinks, map[string]string{
-        "name": p.Provider().Name,
-        "loginLink": providerLoginLink.String(),
-      })
+      if p.ProviderSlug() == "spotify"{
+        c.Set("spotifyLogin", providerLoginLink.String())
+      } else {
+        loginLinks = append(loginLinks, map[string]string{
+          "name": p.Provider().Name,
+          "loginLink": providerLoginLink.String(),
+        })
+      }
     }
     c.Set("loginLinks", loginLinks)
 
@@ -186,6 +190,10 @@ func Auth() gin.HandlerFunc{
     q.Set("from", pageFrom)
     logoutLink.RawQuery = q.Encode()
     c.Set("logoutLink", logoutLink.String())
+
+    s := models.Spotify{}
+    s.LoadSystem()
+    c.Set("spotifyConfigured", s.Exists())
 
     c.Next()
   }

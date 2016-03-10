@@ -23,11 +23,11 @@ func UserContext(c *gin.Context){
 
 func UserInfo(c *gin.Context){
   u := c.MustGet("contextUser").(models.User)
-  a := u.Auth()
 
   helpers.Render(c, "users/info.html", gin.H{
     "user": u,
-    "auth": a,
+    "auth": u.Auth(),
+    "spotify": u.GetSpotify(),
   })
 }
 
@@ -53,18 +53,6 @@ func UserUpdate(c *gin.Context){
   d := db.Db()
   d.Save(&u)
   c.Redirect(302, u.ProfileLink())
-}
-
-func UserRenewToken(c *gin.Context){
-  u := c.MustGet("contextUser").(models.User)
-  a := u.Auth()
-  err := a.RenewAuthToken()
-
-  if err != nil{
-    helpers.Send500(c, fmt.Sprintf("%s (%s)", "Token renew failure", err))
-  } else {
-    c.Redirect(302, u.ProfileLink())
-  }
 }
 
 func UserList(c *gin.Context){

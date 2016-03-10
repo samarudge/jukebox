@@ -12,7 +12,11 @@ var ConfiguredProviders []string
 var Providers = make(map[string]OauthProvider)
 
 func LoadProvider(providerName string, p BaseProvider, additionalConfig map[interface{}]interface{}) OauthProvider{
-  providers := []OauthProvider{NewGoogle(p, additionalConfig),NewSongkick(p, additionalConfig)}
+  providers := []OauthProvider{
+    NewGoogle(p, additionalConfig),
+    NewSongkick(p, additionalConfig),
+    NewSpotify(p, additionalConfig),
+  }
 
   for _, provider := range providers{
     if provider.Provider().ProviderSlug() == providerName{

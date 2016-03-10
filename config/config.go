@@ -64,9 +64,20 @@ func Initialize(filePath string){
       os.Exit(1)
   }
 
+  Config.Auth.Configured_providers = append(Config.Auth.Configured_providers, "spotify")
+  authConfig := ConfigInterface["auth"].(map[interface{}]interface{})
+
   // Load the auth providers
   for _,providerName := range Config.Auth.Configured_providers{
-    providerConfig := ConfigInterface["auth"].(map[interface{}]interface{})[providerName].(map[interface{}]interface{})
+    providerConfig, found := authConfig[providerName].(map[interface{}]interface{})
+    if !found{
+      log.WithFields(log.Fields{
+        "configFile": filePath,
+        "provider": providerName,
+      }).Error("Auth provider supplied but not configured. Add the providers auth keys to the config file.")
+      os.Exit(1)
+    }
+
     p := auth.BaseProvider{}
     p.ClientId = providerConfig["client_id"].(string)
     p.ClientSecret = providerConfig["client_secret"].(string)

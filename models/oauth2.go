@@ -12,6 +12,7 @@ import(
 
 type Oauth2 struct{
   gorm.Model
+  auth.UserData
   Provider      string
   ProviderId    string
   AccessToken   string
@@ -28,6 +29,31 @@ func (a *Oauth2) LoadProvider() auth.OauthProvider{
 
 func (a *Oauth2) ExpiringToken() bool{
   return !(a.RefreshToken == "" && a.TokenExpires.IsZero())
+}
+
+func (a *Oauth2) CreateOrUpdate(token *oauth2.Token) error{
+  UserData, err := a.EnsureAuth(token)
+  if err != nil{
+    return err
+  }
+
+  d := db.Db()
+  a.UserData = UserData
+
+  if d.NewRecord(a) {
+    a.Model = gorm.Model{}
+    d.Create(&a)
+    log.WithFields(log.Fields{
+      "authId": a.ID,
+    }).Debug("Created new auth")
+  } else {
+    d.Save(&a)
+    log.WithFields(log.Fields{
+      "authId": a.ID,
+    }).Debug("Loaded Auth")
+  }
+
+  return nil
 }
 
 func (a *Oauth2) EnsureAuth(token *oauth2.Token) (auth.UserData, error){
@@ -130,6 +156,12 @@ func (a Oauth2) TokenExpiresIn() string{
   } else {
     return "Never"
   }
+}
+
+func (a Oauth2) User() User{
+  u := User{}
+  u.ByAuth(&a)
+  return u
 }
 
 func (a Oauth2) AuthExpiresIn() string{

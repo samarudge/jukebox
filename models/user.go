@@ -2,7 +2,6 @@ package models
 
 import(
   "github.com/jinzhu/gorm"
-  "golang.org/x/oauth2"
   "github.com/samarudge/jukebox/auth"
   "github.com/samarudge/jukebox/db"
   log "github.com/Sirupsen/logrus"
@@ -15,6 +14,8 @@ type User struct{
   auth.UserData
   Oauth2        Oauth2
   Oauth2ID      uint64
+  Spotify       Spotify
+  SpotifyID     uint64
   RoomID        uint64
   LastSeen      time.Time
   IsAdmin       bool
@@ -37,19 +38,27 @@ func (u User) Auth() Oauth2{
   return a
 }
 
-func (u *User) LoginOrSignup(p auth.OauthProvider, token *oauth2.Token) error{
-  a := Oauth2{}
-  a.Provider = p.ProviderSlug()
-  UserData, err := a.EnsureAuth(token)
-  if err != nil{
-    return err
-  }
+func (u User) HasSpotify() bool{
+  hasSpotify, _ := u.getSpotify()
+  return hasSpotify
+}
 
+func (u User) GetSpotify() Spotify{
+  _, spotify := u.getSpotify()
+  return spotify
+}
+
+func (u User) getSpotify() (bool, Spotify){
+  d := db.Db()
+  s := Spotify{}
+  d.Model(&u).Related(&s)
+  return !d.NewRecord(s), s
+}
+
+func (u *User) LoginOrSignup(a Oauth2){
   d := db.Db()
   d.Where("oauth2_id = ?", a.ID).First(&u)
   d.Model(&u).Related(&a)
-
-  u.UserData = UserData
 
   if d.NewRecord(u) {
     u.Model = gorm.Model{}
@@ -66,7 +75,7 @@ func (u *User) LoginOrSignup(p auth.OauthProvider, token *oauth2.Token) error{
 
     log.WithFields(log.Fields{
       "userId": u.ID,
-      "name": u.Name,
+      "name": a.Name,
       "providerId": a.ProviderId,
       "provider": a.Provider,
       "authId": a.ID,
@@ -82,8 +91,17 @@ func (u *User) LoginOrSignup(p auth.OauthProvider, token *oauth2.Token) error{
       "authId": a.ID,
     }).Debug("Login")
   }
+}
 
-  return nil
+func (u *User) LinkSpotify(s Spotify){
+  d := db.Db()
+  d.Model(&u).Related(&s)
+  u.Spotify = s
+  log.WithFields(log.Fields{
+    "spotifyId": s.ID,
+    "userId": u.ID,
+  }).Info("Linking Spotify")
+  d.Save(&u)
 }
 
 func (u User) ProfileLink() string{

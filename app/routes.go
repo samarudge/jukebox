@@ -20,11 +20,11 @@ func loadRoutes(router *gin.Engine){
   adminRoutes.Use(helpers.RequireAdmin())
   adminRoutes.GET("/admin", controllers.AdminIndex)
   adminRoutes.GET("/users", controllers.UserList)
+  adminRoutes.GET("/auths", controllers.AuthList)
 
   userRoutes := router.Group("/users")
   userRoutes.Use(helpers.AuthorizedUser())
   userRoutes.Use(controllers.UserContext)
   userRoutes.GET("/:userId", controllers.UserInfo)
   userRoutes.POST("/:userId", controllers.UserUpdate)
-  userRoutes.POST("/:userId/renewToken", controllers.UserRenewToken)
 }
