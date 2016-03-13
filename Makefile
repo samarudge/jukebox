@@ -21,6 +21,7 @@ views/bindata.go: views/**.html | .tools/go-bindata
 
 vendor/: glide.lock | .tools/glide
 	.tools/glide install
+	if [ "${UPDATE_DEPS}" == "1" ]; then .tools/glide up; git diff glide.lock; fi
 
 clean:
 	rm -f ./output/jukebox
