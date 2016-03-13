@@ -7,3 +7,4 @@ pkg/
 /output/
 /.tools/
 /prebuild.sh
+/views/bindata.go

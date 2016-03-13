@@ -1,5 +1,5 @@
-hash: 621465ea5429de5675c0cfbae39b313663ae74bf8ceca5f1e6bdd895434acb42
-updated: 2016-02-28T12:01:52.888056238Z
+hash: bb3ffe6e7708f9250d0c1f52120213d90d6ca5cb717f93825c982e1033803bd4
+updated: 2016-03-12T14:07:05.428364086Z
 imports:
 - name: github.com/gin-gonic/gin
   version: b3878c2465f34fa1772f666fea9adf05f1dca727
@@ -20,6 +20,8 @@ imports:
   version: aa45da15421ddb1549a7060e5c189f8350a29166
 - name: github.com/jinzhu/inflection
   version: 3272df6c21d04180007eb3349844c89a3856bc25
+- name: github.com/jteeuwen/go-bindata
+  version: a0ff2567cfb70903282db057e799fd826784d41d
 - name: github.com/lib/pq
   version: 69552e54d2a9d4c6a2438926a774930f7bc398ec
   subpackages:

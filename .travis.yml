@@ -3,6 +3,14 @@ language: go
 go:
   - 1.5
   - 1.6
+  - tip
+
+matrix:
+  allow_failures:
+    - go: tip
+    - env: "GO15VENDOREXPERIMENT=1; UPDATE_DEPS=1"
 
 env:
-  - GO15VENDOREXPERIMENT=1
+  matrix:
+    - "GO15VENDOREXPERIMENT=1; UPDATE_DEPS=0"
+    - "GO15VENDOREXPERIMENT=1; UPDATE_DEPS=1"
